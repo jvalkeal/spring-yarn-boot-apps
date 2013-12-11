@@ -1,0 +1,191 @@
+description = 'Spring Yarn Boot Apps'
+defaultTasks 'build'
+
+apply plugin: 'base'
+
+buildscript {
+	repositories {
+		mavenLocal()
+		maven { url "http://repo.springsource.org/plugins-release" }
+	}
+	dependencies {
+		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.6")
+		//classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootLocalVersion")
+	}
+}
+
+allprojects {
+	group = 'org.springframework.yarn'
+	//logging.captureStandardOutput LogLevel.DEBUG
+ 
+	repositories {
+		mavenLocal()
+		maven { url 'http://repo.springsource.org/libs-milestone' }
+		mavenCentral()
+	}
+}
+
+def hadoopDefault = "hadoop22"
+def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
+def springDataVersion = hadoop22SpringDataVersion
+
+switch (hadoopDistro) {
+
+	// vanilla hadoop 2.2.x
+	case "hadoop22":
+		springDataVersion = hadoop22SpringDataVersion
+		println "Using Apache Hadoop 2.2.x Spring Hadoop Dependencies - [$springDataVersion]"
+	break;
+
+	// pivotal
+	case "phd1":
+		springDataVersion = phd1SpringDataVersion
+		println "Using Pivotal HD 1.0 Spring Hadoop Dependencies - [$springDataVersion]"
+	break;
+
+	default:
+		if (!project.hasProperty("distro")) {
+			println "Using default distro: Apache Hadoop Spring Hadoop Dependencies - [$springDataVersion]"
+		} else {
+			if (hadoopDistro == hadoopDefault) {
+				println "Using Apache Hadoop 2.2.x Spring Hadoop Dependencies - [$springDataVersion]"
+			} else {
+				println "Failing build: $hadoopDistro is not a supported distro"
+				println "Supported distros: hadoop22 and phd1"
+				println "* default"
+				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
+			}
+		}
+		springDataVersion = hadoop22SpringDataVersion
+
+}
+
+subprojects { subproject ->
+	apply plugin: 'idea'
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'maven'
+	apply plugin: 'spring-boot'
+	
+	sourceCompatibility = 1.6
+	targetCompatibility = 1.6
+	
+	eclipse {
+		project {
+			natures += 'org.springframework.ide.eclipse.core.springnature'
+		}
+	}
+
+	[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial", "-Xlint:-options"]
+
+	task sourcesJar(type: Jar) {
+		classifier = 'sources'
+	}
+
+
+	springBoot {
+		backupSource = true
+		//providedConfiguration = 'hadoopprovided'
+		//customConfiguration = 'hadoopruntime'
+	}
+
+	configurations {
+		hadoopruntime.exclude group: 'log4j'
+		hadoopruntime.exclude group: 'org.slf4j'
+		hadoopruntime.exclude group: 'org.apache.hadoop'
+		hadoopruntime.exclude group: 'org.apache.hive'
+		hadoopruntime.exclude group: 'commons-logging'
+		hadoopruntime.exclude group: 'org.codehaus.jettison'
+		hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+	}
+	
+	task testJar(type: Jar) {
+		classifier = 'tests'
+		from sourceSets.test.output
+	}
+
+	task containerJar(type: Jar) {
+		appendix = 'container'
+		from sourceSets.main.output
+		exclude('**/*Appmaster*')
+		exclude('**/*Client*')
+	}
+
+	task appmasterJar(type: Jar) {
+		appendix = 'appmaster'
+		from sourceSets.main.output
+		exclude('**/*Container*')
+		exclude('**/*Client*')
+	}
+
+	task clientJar(type: Jar) {
+		appendix = 'client'
+		from sourceSets.main.output
+		exclude('**/*Appmaster*')
+		exclude('**/*Container*')
+	}
+
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+	}
+
+	task containerBoot(type: BootRepackage, dependsOn: containerJar) {
+		//customConfiguration = "hadoopruntime"
+		withJarTask = containerJar
+	}
+
+	task appmasterBoot(type: BootRepackage, dependsOn: appmasterJar) {
+		//customConfiguration = "hadoopruntime"
+		withJarTask = appmasterJar
+	}
+
+	assemble.dependsOn = ['jar', 'testJar']
+
+	clean.doLast {ant.delete(dir: "target")}
+
+	jar.enabled = false
+	bootRepackage.enabled = false
+
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBoot,appmasterBoot]
+
+	//build.dependsOn(clientBoot)
+	//build.dependsOn(containerBoot)
+	//build.dependsOn(appmasterBoot)
+	test.dependsOn(bootJars)
+	build.dependsOn(bootJars)
+}
+
+
+project('multi-context-boot') {
+
+	dependencies {
+		//compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+		//compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
+		//compile "org.springframework.data:spring-yarn-batch:$springDataVersion"
+		//compile "org.springframework.data:spring-yarn-boot:$springDataVersion"
+		//runtime "org.springframework.data:spring-data-hadoop:$springDataVersion"
+		//runtime "org.springframework.data:spring-data-hadoop-core:$springDataVersion"
+
+		compile ("org.springframework.data:spring-yarn-boot:$springDataVersion") {
+			exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+		}
+		runtime ("org.springframework.data:spring-data-hadoop:$springDataVersion") {
+			exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+		}
+		runtime ("org.springframework.data:spring-data-hadoop-core:$springDataVersion") {
+			exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+		}
+
+		runtime "log4j:log4j:$log4jVersion"
+		runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		testCompile "org.springframework.data:spring-yarn-test:$springDataVersion"
+		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+
+		hadoopruntime configurations.runtime
+	}
+
+}
+

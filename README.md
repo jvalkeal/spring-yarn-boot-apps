@@ -1,4 +1,2 @@
-spring-yarn-boot-apps
+Spring Yarn Boot Apps
 =====================
-
-Examples for Spring Boot and Spring Yarn
