@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:yarn="http://www.springframework.org/schema/yarn"
+	xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"
+	xmlns:yarn-batch="http://www.springframework.org/schema/yarn/batch"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
+		http://www.springframework.org/schema/yarn/integration http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+		http://www.springframework.org/schema/yarn/batch http://www.springframework.org/schema/yarn/batch/spring-yarn-batch.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="yarnEventPublisher" class="org.springframework.yarn.event.DefaultYarnEventPublisher"/>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="jobRepositoryService" class="org.springframework.yarn.batch.repository.JobRepositoryService" >
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="jobExplorer" ref="jobExplorer"/>
+	</bean>
+
+	<bean id="batchService" class="org.springframework.yarn.batch.repository.BatchAppmasterService" >
+		<property name="jobRepositoryRemoteService" ref="jobRepositoryService"/>
+	</bean>
+
+	<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+	<yarn-int:converter>
+		<bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+			<constructor-arg ref="mapper"/>
+		</bean>
+	</yarn-int:converter>
+
+	<yarn-int:converter>
+		<bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+			<constructor-arg ref="mapper"/>
+			<constructor-arg>
+				<array>
+					<value>org.springframework.yarn.batch.repository.bindings</value>
+					<value>org.springframework.yarn.batch.repository.bindings.exp</value>
+					<value>org.springframework.yarn.batch.repository.bindings.repo</value>
+				</array>
+			</constructor-arg>
+		</bean>
+	</yarn-int:converter>
+
+	<yarn-int:amservice service-ref="batchService"/>
+
+	<!-- batch config -->
+
+	<bean id="partitionHandler" class="org.springframework.yarn.batch.partition.StaticBatchPartitionHandler">
+		<!-- <constructor-arg ref="yarnAppmaster"/> -->
+		<property name="batchAppmaster" ref="yarnAppmaster"/>
+		<property name="gridSize" value="2"/>
+	</bean>
+
+	<bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner"/>
+
+	<batch:job id="job">
+		<batch:step id="master1" next="master2">
+			<batch:partition partitioner="partitioner" handler="partitionHandler"/>
+		</batch:step>
+		<batch:step id="master2">
+			<batch:partition partitioner="partitioner" handler="partitionHandler"/>
+		</batch:step>
+	</batch:job>
+
+</beans>
