@@ -15,12 +15,16 @@
  */
 package org.springframework.yarn.examples;
 
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.yarn.YarnSystemConstants;
+import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
 import org.springframework.yarn.container.YarnContainer;
 
 /**
@@ -31,12 +35,24 @@ import org.springframework.yarn.container.YarnContainer;
  */
 @Configuration
 @EnableAutoConfiguration
-@ImportResource("container-context.xml")
+@EnableYarnRemoteBatchProcessing
 public class BatchContainerApplication {
+
+	@Autowired
+    private StepBuilderFactory steps;
+
+	@Bean
+	protected Tasklet tasklet() {
+		return new PrintTasklet("Hello");
+	}
+
+	@Bean
+	protected Step remoteStep() throws Exception {
+		return this.steps.get("remoteStep").tasklet(tasklet()).build();
+	}
 
 	@Bean(name=YarnSystemConstants.DEFAULT_ID_CONTAINER_CLASS)
 	public Class<? extends YarnContainer> yarnContainerClass() {
-//		return DefaultBatchYarnContainer.class;
 		return BatchContainer.class;
 	}
 

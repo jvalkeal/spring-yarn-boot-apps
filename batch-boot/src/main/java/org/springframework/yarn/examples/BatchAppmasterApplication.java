@@ -15,16 +15,27 @@
  */
 package org.springframework.yarn.examples;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.partition.PartitionHandler;
+import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.batch.am.AbstractBatchAppmaster;
+import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
+import org.springframework.yarn.batch.partition.StaticBatchPartitionHandler;
 
 /**
  * Spring Boot main definition for Yarn Appmaster.
@@ -36,8 +47,10 @@ import org.springframework.context.annotation.ImportResource;
 @EnableAutoConfiguration
 @ComponentScan
 @EnableBatchProcessing
-@ImportResource("appmaster-context.xml")
+@EnableYarnBatchProcessing
 public class BatchAppmasterApplication {
+
+	private final static Log log = LogFactory.getLog(BatchAppmasterApplication.class);
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -48,47 +61,38 @@ public class BatchAppmasterApplication {
 	@Autowired
 	private StepBuilderFactory stepFactory;
 
-//	@Bean
-//	public YarnEventPublisher yarnEventPublisher() {
-//		return new DefaultYarnEventPublisher();
-//	}
-//
-//	@Bean
-//	public AppmasterService batchService() {
-//		BatchAppmasterService service = new BatchAppmasterService();
-//		JobRepositoryService remoteService = new JobRepositoryService();
-//		service.setJobRepositoryRemoteService(remoteService);
-//		return service;
-//	}
-//
-//
+	@Autowired
+	private YarnAppmaster yarnAppmaster;
 
-//	@Bean
-//	protected Tasklet tasklet() {
-//		return new Tasklet() {
-//			@Override
-//			public RepeatStatus execute(StepContribution contribution, ChunkContext context) {
-//				return RepeatStatus.FINISHED;
-//			}
-//		};
-//	}
+	@Bean
+	public Job job() throws Exception {
+		log.info("XXX job()");
+		return jobFactory.get("job").start(master1()).next(master2()).build();
+	}
 
-//	@Bean
-//	public Job job() throws Exception {
-////		return jobFactory.get("job").start(step1()).build();
-//		return jobFactory.get("job").start(master1()).next(master2()).build();
-//	}
-//
-//	@Bean
-//	protected Step master1() throws Exception {
-//		return stepFactory.get("master1").tasklet(null).build();
-//	}
-//
-//	@Bean
-//	protected Step master2() throws Exception {
-//		return stepFactory.get("master2").tasklet(null).build();
-//	}
+	@Bean
+	protected Step master1() throws Exception {
+		log.info("XXX master1()");
+		return stepFactory.get("master1").partitioner("remoteStep", partitioner()).partitionHandler(partitionHandler()).build();
+	}
 
+	@Bean
+	protected Step master2() throws Exception {
+		log.info("XXX master2()");
+		return stepFactory.get("master2").partitioner("remoteStep", partitioner()).partitionHandler(partitionHandler()).build();
+	}
+
+	@Bean
+	protected Partitioner partitioner() {
+		log.info("XXX partitioner()");
+		return new SimplePartitioner();
+	}
+
+	@Bean
+	protected PartitionHandler partitionHandler() {
+		log.info("XXX partitionHandler()");
+		return new StaticBatchPartitionHandler((AbstractBatchAppmaster) yarnAppmaster, 2);
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(BatchAppmasterApplication.class, args);

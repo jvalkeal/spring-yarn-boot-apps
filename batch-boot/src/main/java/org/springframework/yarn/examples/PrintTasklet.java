@@ -17,7 +17,6 @@ package org.springframework.yarn.examples;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -35,14 +34,12 @@ public class PrintTasklet implements Tasklet {
 
 	private String message;
 
-	public void setMessage(String message) {
+	public PrintTasklet(String message) {
 		this.message = message;
 	}
 
-	public ExitStatus execute() throws Exception {
-		log.info("execute1: " + message);
-		System.out.print(message);
-		return ExitStatus.COMPLETED;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	@Override

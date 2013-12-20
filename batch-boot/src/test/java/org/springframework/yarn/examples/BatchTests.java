@@ -75,7 +75,7 @@ public class BatchTests extends AbstractYarnClusterTests {
 					String content = scanner.useDelimiter("\\A").next();
 					scanner.close();
 					// this is what container will log in stdout
-					assertThat(content, containsString("Hello"));
+					assertThat(content, containsString("execute2: Hello"));
 				}
 			} else if (file.getName().endsWith("stderr")) {
 				String content = "";

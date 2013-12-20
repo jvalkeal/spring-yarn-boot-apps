@@ -10,8 +10,8 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.6")
-		//classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootLocalVersion")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+		//classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootLocalVersion")
 	}
 }
 
@@ -140,12 +140,14 @@ subprojects { subproject ->
 		withJarTask = appmasterJar
 	}
 
-	assemble.dependsOn = ['jar', 'testJar']
+	//assemble.dependsOn = ['jar', 'testJar']
+	assemble.dependsOn(testJar)
 
 	clean.doLast {ant.delete(dir: "target")}
 
 	jar.enabled = false
 	bootRepackage.enabled = false
+	//bootRepackage.withJarTask = jar
 
 	task bootJars
 	bootJars.dependsOn = [clientBoot,containerBoot,appmasterBoot]
@@ -153,8 +155,9 @@ subprojects { subproject ->
 	//build.dependsOn(clientBoot)
 	//build.dependsOn(containerBoot)
 	//build.dependsOn(appmasterBoot)
-	test.dependsOn(bootJars)
+	//test.dependsOn(bootJars)
 	build.dependsOn(bootJars)
+
 }
 
 
