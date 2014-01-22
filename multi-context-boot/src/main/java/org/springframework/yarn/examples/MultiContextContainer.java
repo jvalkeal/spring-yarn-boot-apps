@@ -15,36 +15,23 @@
  */
 package org.springframework.yarn.examples;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.yarn.container.YarnContainer;
+import org.springframework.yarn.container.AbstractYarnContainer;
 
 /**
- * Simple container example.
+ * Simple container example which just logs a message.
  *
  * @author Janne Valkealahti
  *
  */
-@Component
-public class MultiContextContainer implements YarnContainer {
+public class MultiContextContainer extends AbstractYarnContainer {
 
 	private static final Log log = LogFactory.getLog(MultiContextContainer.class);
 
 	@Override
-	public void run() {
+	protected void runInternal() {
 		log.info("Hello from MultiContextContainer");
-	}
-
-	@Override
-	public void setEnvironment(Map<String, String> environment) {
-	}
-
-	@Override
-	public void setParameters(Properties parameters) {
 	}
 
 }

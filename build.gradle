@@ -10,8 +10,8 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.6")
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
-		//classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootLocalVersion")
+		//classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootLocalVersion")
 	}
 }
 
@@ -112,8 +112,24 @@ subprojects { subproject ->
 		exclude('**/*Client*')
 	}
 
+	task containerZip(type: Jar) {
+		appendix = 'container'
+		extension = 'zip'
+		from sourceSets.main.output
+		exclude('**/*Appmaster*')
+		exclude('**/*Client*')
+	}
+
 	task appmasterJar(type: Jar) {
 		appendix = 'appmaster'
+		from sourceSets.main.output
+		exclude('**/*Container*')
+		exclude('**/*Client*')
+	}
+
+	task appmasterZip(type: Jar) {
+		appendix = 'appmaster'
+		extension = 'zip'
 		from sourceSets.main.output
 		exclude('**/*Container*')
 		exclude('**/*Client*')
@@ -130,14 +146,22 @@ subprojects { subproject ->
 		withJarTask = clientJar
 	}
 
-	task containerBoot(type: BootRepackage, dependsOn: containerJar) {
-		//customConfiguration = "hadoopruntime"
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
 		withJarTask = containerJar
 	}
 
-	task appmasterBoot(type: BootRepackage, dependsOn: appmasterJar) {
-		//customConfiguration = "hadoopruntime"
+	task containerBootZip(type: BootRepackage, dependsOn: containerZip) {
+		customConfiguration = "hadoopruntime"
+		withJarTask = containerZip
+	}
+
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
 		withJarTask = appmasterJar
+	}
+
+	task appmasterBootZip(type: BootRepackage, dependsOn: appmasterZip) {
+		customConfiguration = "hadoopruntime"
+		withJarTask = appmasterZip
 	}
 
 	//assemble.dependsOn = ['jar', 'testJar']
@@ -150,7 +174,7 @@ subprojects { subproject ->
 	//bootRepackage.withJarTask = jar
 
 	task bootJars
-	bootJars.dependsOn = [clientBoot,containerBoot,appmasterBoot]
+	bootJars.dependsOn = [clientBoot,containerBootJar,containerBootZip,appmasterBootJar,appmasterBootZip]
 
 	//build.dependsOn(clientBoot)
 	//build.dependsOn(containerBoot)
@@ -164,12 +188,6 @@ subprojects { subproject ->
 project('multi-context-boot') {
 
 	dependencies {
-		//compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
-		//compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
-		//compile "org.springframework.data:spring-yarn-batch:$springDataVersion"
-		//compile "org.springframework.data:spring-yarn-boot:$springDataVersion"
-		//runtime "org.springframework.data:spring-data-hadoop:$springDataVersion"
-		//runtime "org.springframework.data:spring-data-hadoop-core:$springDataVersion"
 
 		compile ("org.springframework.data:spring-yarn-boot:$springDataVersion") {
 			exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
@@ -183,12 +201,20 @@ project('multi-context-boot') {
 
 		runtime "log4j:log4j:$log4jVersion"
 		runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
 		testCompile "org.springframework.data:spring-yarn-test:$springDataVersion"
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 
+		
+
 		hadoopruntime configurations.runtime
+		//hadoopruntime.include group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
 	}
+
+	configurations { 
+		testRuntime.exclude module: "spring-data-hadoop-batch" 
+	} 
 
 }
 

@@ -16,8 +16,6 @@
 
 	<yarn:environment include-system-env="true">
 		<yarn:classpath/>
-		SHDP_BOOT_JAR=multi-context-boot-container-2.0.0.BUILD-SNAPSHOT.jar
-		SHDP_BOOT_DIR=/app/multi-context/
 	</yarn:environment>
 
 	<yarn:client app-name="multi-context">

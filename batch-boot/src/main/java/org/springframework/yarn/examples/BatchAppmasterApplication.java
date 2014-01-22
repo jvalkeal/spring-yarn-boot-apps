@@ -15,8 +15,6 @@
  */
 package org.springframework.yarn.examples;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -50,8 +48,6 @@ import org.springframework.yarn.batch.partition.StaticBatchPartitionHandler;
 @EnableYarnBatchProcessing
 public class BatchAppmasterApplication {
 
-	private final static Log log = LogFactory.getLog(BatchAppmasterApplication.class);
-
 	@Autowired
 	private JobRepository jobRepository;
 
@@ -66,40 +62,40 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	public Job job() throws Exception {
-		log.info("XXX job()");
-		return jobFactory.get("job").start(master1()).next(master2()).build();
+		return jobFactory.get("job")
+				.start(master1())
+				.next(master2())
+				.build();
 	}
 
 	@Bean
 	protected Step master1() throws Exception {
-		log.info("XXX master1()");
-		return stepFactory.get("master1").partitioner("remoteStep", partitioner()).partitionHandler(partitionHandler()).build();
+		return stepFactory.get("master1")
+				.partitioner("remoteStep", partitioner())
+				.partitionHandler(partitionHandler())
+				.build();
 	}
 
 	@Bean
 	protected Step master2() throws Exception {
-		log.info("XXX master2()");
-		return stepFactory.get("master2").partitioner("remoteStep", partitioner()).partitionHandler(partitionHandler()).build();
+		return stepFactory.get("master2")
+				.partitioner("remoteStep", partitioner())
+				.partitionHandler(partitionHandler())
+				.build();
 	}
 
 	@Bean
 	protected Partitioner partitioner() {
-		log.info("XXX partitioner()");
 		return new SimplePartitioner();
 	}
 
 	@Bean
 	protected PartitionHandler partitionHandler() {
-		log.info("XXX partitionHandler()");
 		return new StaticBatchPartitionHandler((AbstractBatchAppmaster) yarnAppmaster, 2);
 	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(BatchAppmasterApplication.class, args);
-
-//		System.exit(SpringApplication.exit(SpringApplication.run(
-//                SampleBatchApplication.class, args)));
-
 	}
 
 }
