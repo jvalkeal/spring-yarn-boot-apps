@@ -19,7 +19,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.yarn.client.YarnClient;
 
+/**
+ * Spring Boot main definition for Yarn Container. Instead of using
+ * {@link YarnClient} interface, define a pojo to be used
+ * as a container.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 @Configuration
 @EnableAutoConfiguration
 public class ActivatorContainerApplication {
