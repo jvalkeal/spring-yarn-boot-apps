@@ -1,0 +1,15 @@
+spring:
+    yarn:
+        appName: activator-boot
+        applicationDir: /app/activator-sample/
+        fsUri: hdfs://localhost:8020
+        rmAddress: localhost:8032
+        schedulerAddress: localhost:8030
+        client:
+            appmasterFile: activator-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+            files:
+              - "file:activator-boot/build/libs/activator-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:activator-boot/build/libs/activator-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+        appmaster:
+            containerCount: 2
+            containerFile: activator-boot-container-2.0.0.BUILD-SNAPSHOT.jar
