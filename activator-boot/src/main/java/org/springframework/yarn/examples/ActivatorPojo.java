@@ -17,6 +17,10 @@ package org.springframework.yarn.examples;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.yarn.annotation.OnYarnContainerStart;
 import org.springframework.yarn.annotation.YarnContainer;
 
@@ -35,9 +39,22 @@ public class ActivatorPojo {
 
 	private static final Log log = LogFactory.getLog(ActivatorPojo.class);
 
+	@Autowired
+	private Configuration configuration;
+
 	@OnYarnContainerStart
 	public void publicVoidNoArgsMethod() {
 		log.info("Hello from ActivatorPojo");
+		log.info("Checking access to hdfs");
+		listFiles();
+	}
+
+	private void listFiles() {
+		@SuppressWarnings("resource")
+		FsShell shell = new FsShell(configuration);
+		for (FileStatus s : shell.ls(true, "/")) {
+			log.info(s);
+		}
 	}
 
 }
