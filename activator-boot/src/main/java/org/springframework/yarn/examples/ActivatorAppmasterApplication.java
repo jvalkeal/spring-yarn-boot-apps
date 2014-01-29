@@ -17,7 +17,6 @@ package org.springframework.yarn.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Spring Boot main definition for Yarn Appmaster.
@@ -25,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Janne Valkealahti
  *
  */
-@Configuration
 @EnableAutoConfiguration
 public class ActivatorAppmasterApplication {
 

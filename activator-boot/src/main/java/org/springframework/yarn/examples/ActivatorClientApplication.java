@@ -17,7 +17,6 @@ package org.springframework.yarn.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.client.YarnClient;
 
 /**
@@ -26,7 +25,6 @@ import org.springframework.yarn.client.YarnClient;
  * @author Janne Valkealahti
  *
  */
-@Configuration
 @EnableAutoConfiguration
 public class ActivatorClientApplication {
 

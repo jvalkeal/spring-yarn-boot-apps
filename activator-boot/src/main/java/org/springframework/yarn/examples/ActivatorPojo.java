@@ -17,8 +17,8 @@ package org.springframework.yarn.examples;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.yarn.annotation.OnYarnContainerStart;
 import org.springframework.yarn.annotation.YarnContainer;
-import org.springframework.yarn.annotation.YarnContainerActivator;
 
 /**
  * A simple pojo to demonstrate container activator concept.
@@ -35,7 +35,7 @@ public class ActivatorPojo {
 
 	private static final Log log = LogFactory.getLog(ActivatorPojo.class);
 
-	@YarnContainerActivator
+	@OnYarnContainerStart
 	public void publicVoidNoArgsMethod() {
 		log.info("Hello from ActivatorPojo");
 	}
