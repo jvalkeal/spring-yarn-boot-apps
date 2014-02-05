@@ -1,0 +1,21 @@
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/batch
+        username: batch
+        password: batch
+        driverClassName: com.mysql.jdbc.Driver
+    yarn:
+        appName: batch-db-boot
+        applicationDir: /app/batch-db-boot/
+        fsUri: hdfs://localhost:8020
+        rmAddress: localhost:8032
+        schedulerAddress: localhost:8030
+        client:
+            appmasterFile: batch-db-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+            files:
+              - "file:batch-boot/build/libs/batch-db-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:batch-boot/build/libs/batch-db-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+        appmaster:
+            containerCount: 2
+            appmasterClass: org.springframework.yarn.batch.am.BatchAppmaster
+            containerFile: batch-db-boot-container-2.0.0.BUILD-SNAPSHOT.jar

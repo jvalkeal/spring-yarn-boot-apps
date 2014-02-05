@@ -76,15 +76,20 @@ public class MultiContextBootClientTests  {
 		YarnClusterManager manager = YarnClusterManager.getInstance();
 		YarnCluster cluster = manager.getCluster(new ClusterInfo());
 		cluster.start();
-
 		Configuration configuration = cluster.getConfiguration();
+
+		String[] args = new String[]{
+				"--spring.yarn.fsUri="+configuration.get("fs.defaultFS"),
+				"--spring.yarn.rmAddress="+configuration.get("yarn.resourcemanager.address"),
+				"--spring.yarn.schedulerAddress="+configuration.get("yarn.resourcemanager.scheduler.address"),
+				"--spring.yarn.client.files[0]=file:build/libs/multi-context-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
+				"--spring.yarn.client.files[1]=file:build/libs/multi-context-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
+		};
+
 		System.out.println("ZZZZ: " + configuration.get("yarn.resourcemanager.scheduler.address"));
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(MultiContextClientApplication.class)
 			.initializers(new TestInitializer(configuration))
-			.run(new String[]{"--spring.yarn.fsUri="+configuration.get("fs.defaultFS"),
-					"--spring.yarn.rmAddress="+configuration.get("yarn.resourcemanager.address"),
-							"--spring.yarn.schedulerAddress="+configuration.get("yarn.resourcemanager.scheduler.address",
-									"--spring.yarn.client.files='file:build/libs/multi-context-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar,file:build/libs/multi-context-boot-container-2.0.0.BUILD-SNAPSHOT.jar'")});
+			.run(args);
 
 		YarnClient client = context.getBean(YarnClient.class);
 		ApplicationId applicationId = client.submitApplication();

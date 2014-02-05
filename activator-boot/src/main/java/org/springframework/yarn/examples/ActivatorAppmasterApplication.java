@@ -17,6 +17,9 @@ package org.springframework.yarn.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.yarn.event.LoggingListener;
 
 /**
  * Spring Boot main definition for Yarn Appmaster.
@@ -24,11 +27,17 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
  * @author Janne Valkealahti
  *
  */
+@Configuration
 @EnableAutoConfiguration
 public class ActivatorAppmasterApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ActivatorAppmasterApplication.class, args);
+	}
+
+	@Bean
+	public LoggingListener loggingListener() {
+		return new LoggingListener("info");
 	}
 
 }

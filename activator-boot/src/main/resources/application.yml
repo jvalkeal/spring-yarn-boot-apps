@@ -12,4 +12,5 @@ spring:
               - "file:activator-boot/build/libs/activator-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
         appmaster:
             containerCount: 2
+            appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
             containerFile: activator-boot-container-2.0.0.BUILD-SNAPSHOT.jar

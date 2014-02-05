@@ -32,7 +32,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.batch.am.AbstractBatchAppmaster;
-import org.springframework.yarn.batch.am.BatchAppmaster;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
 import org.springframework.yarn.batch.partition.StaticBatchPartitionHandler;
 

@@ -1,0 +1,16 @@
+spring:
+    yarn:
+        appName: batch-boot
+        applicationDir: /app/batch-boot/
+        fsUri: hdfs://localhost:8020
+        rmAddress: localhost:8032
+        schedulerAddress: localhost:8030
+        client:
+            appmasterFile: batch-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+            files:
+              - "file:batch-boot/build/libs/batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:batch-boot/build/libs/batch-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+        appmaster:
+            containerCount: 2
+            appmasterClass: org.springframework.yarn.batch.am.BatchAppmaster
+            containerFile: batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar

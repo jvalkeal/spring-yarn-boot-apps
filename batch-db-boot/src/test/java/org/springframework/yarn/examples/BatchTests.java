@@ -82,8 +82,8 @@ public class BatchTests  {
 				"--spring.yarn.fsUri="+configuration.get("fs.defaultFS"),
 				"--spring.yarn.rmAddress="+configuration.get("yarn.resourcemanager.address"),
 				"--spring.yarn.schedulerAddress="+configuration.get("yarn.resourcemanager.scheduler.address"),
-				"--spring.yarn.client.files[0]=file:build/libs/batch-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
-				"--spring.yarn.client.files[1]=file:build/libs/batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
+				"--spring.yarn.client.files[0]=file:build/libs/batch-db-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
+				"--spring.yarn.client.files[1]=file:build/libs/batch-db-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
 		};
 
 		System.out.println("ZZZZ: " + configuration.get("yarn.resourcemanager.scheduler.address"));
