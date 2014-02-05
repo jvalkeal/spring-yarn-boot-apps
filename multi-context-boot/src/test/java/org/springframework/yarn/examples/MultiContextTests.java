@@ -29,41 +29,33 @@ import java.util.concurrent.TimeUnit;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
-import org.springframework.test.annotation.Timed;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
+import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests.EmptyConfig;
 import org.springframework.yarn.test.context.MiniYarnCluster;
 import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
-import org.springframework.yarn.test.junit.AbstractYarnClusterTests;
 import org.springframework.yarn.test.junit.ApplicationInfo;
 import org.springframework.yarn.test.support.ContainerLogUtils;
 
-/**
- * Tests for multi context example. We're checking that
- * application status is ok and log files looks
- * what is expected.
- *
- * @author Janne Valkealahti
- *
- */
-@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class, classes=EmptyConfig.class)
 @MiniYarnCluster
-public class MultiContextTests extends AbstractYarnClusterTests {
+public class MultiContextTests extends AbstractBootYarnClusterTests {
 
 	@Test
-	@Timed(millis=130000)
 	public void testAppSubmission() throws Exception {
-		ApplicationInfo info = submitApplicationAndWait(120, TimeUnit.SECONDS);
-		assertThat(info, notNullValue());
-		assertThat(info.getYarnApplicationState(), notNullValue());
-		assertThat(info.getApplicationId(), notNullValue());
-		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
+		// need to override default paths in application.yml
+		String[] args = new String[]{
+				"--spring.yarn.client.files[0]=file:build/libs/multi-context-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
+				"--spring.yarn.client.files[1]=file:build/libs/multi-context-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
+		};
+
+		ApplicationInfo info = submitApplicationAndWaitState(MultiContextClientApplication.class, args, 70,
+				TimeUnit.SECONDS, YarnApplicationState.FINISHED, YarnApplicationState.FAILED);
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
 
-		// appmaster and 4 containers should
-		// make it 10 log files
 		assertThat(resources, notNullValue());
-		assertThat(resources.size(), is(10));
+		assertThat(resources.size(), is(6));
 
 		for (Resource res : resources) {
 			File file = res.getFile();
@@ -85,7 +77,7 @@ public class MultiContextTests extends AbstractYarnClusterTests {
 					scanner.close();
 				}
 				// can't have anything in stderr files
-//				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
+				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
 			}
 		}
 	}
