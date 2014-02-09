@@ -15,39 +15,53 @@
  */
 package org.springframework.yarn.examples;
 
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.YarnSystemConstants;
-import org.springframework.yarn.container.YarnContainer;
+import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
 
-/**
- * Multi context container definition for Spring Boot Application.
- *
- * @author Janne Valkealahti
- *
- */
 @Configuration
 @EnableAutoConfiguration
-public class MultiContextContainerApplication {
+@EnableYarnRemoteBatchProcessing
+public class BatchContainerApplication {
 
-//	@Bean(name=YarnSystemConstants.DEFAULT_ID_CONTAINER_CLASS)
-//	public Class<? extends YarnContainer> yarnContainerClass() {
-//		return MultiContextContainer.class;
-//	}
+	@Autowired
+    private StepBuilderFactory steps;
+
+	@Bean
+	public Step remoteStep1() throws Exception {
+		return steps
+				.get("remoteStep1")
+				.tasklet(tasklet())
+				.build();
+	}
+
+	@Bean
+	public Step remoteStep2() throws Exception {
+		return steps
+				.get("remoteStep2")
+				.tasklet(tasklet())
+				.build();
+	}
+
+	@Bean
+	public Tasklet tasklet() {
+		return new HdfsTasklet();
+	}
 
 	@Bean(name=YarnSystemConstants.DEFAULT_ID_CONTAINER_REF)
 	public Object yarnContainer() {
-		// TODO: fix so that we can return MultiContextContainer instead of Object
-		//       fails because of @ConditionalOnMissingBean(YarnContainer.class) on
-		//       YarnContainerAutoConfiguration
-		return new MultiContextContainer();
+		return new BatchContainer();
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(MultiContextContainerApplication.class, args);
+		SpringApplication.run(BatchContainerApplication.class, args);
 	}
 
 }

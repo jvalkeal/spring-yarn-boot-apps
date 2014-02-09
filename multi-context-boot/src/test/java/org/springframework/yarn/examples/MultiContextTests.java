@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Scanner;
 
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
@@ -48,8 +49,9 @@ public class MultiContextTests extends AbstractBootYarnClusterTests {
 		};
 
 		ApplicationInfo info = submitApplicationAndWait(MultiContextClientApplication.class, args);
-		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
+		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
+		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
 		assertThat(resources, notNullValue());
 		assertThat(resources.size(), is(6));
 
