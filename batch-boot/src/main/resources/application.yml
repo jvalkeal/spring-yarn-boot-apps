@@ -1,5 +1,16 @@
 spring:
+    batch:
+        job:
+            enabled: false
     yarn:
+        batch:
+            job:
+                enabled: true
+                name: job
+            jobs:
+              - name: job
+                enabled: true
+                next: true
         appName: batch-boot
         applicationDir: /app/batch-boot/
         fsUri: hdfs://localhost:8020
@@ -11,6 +22,5 @@ spring:
               - "file:batch-boot/build/libs/batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
               - "file:batch-boot/build/libs/batch-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
         appmaster:
-            containerCount: 2
-            appmasterClass: org.springframework.yarn.batch.am.BatchAppmaster
+            waitLatch: false
             containerFile: batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar

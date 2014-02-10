@@ -16,35 +16,26 @@
 package org.springframework.yarn.examples;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.am.YarnAppmaster;
-import org.springframework.yarn.batch.am.AbstractBatchAppmaster;
-import org.springframework.yarn.batch.am.BatchAppmaster;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
 import org.springframework.yarn.batch.partition.StaticBatchPartitionHandler;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan
-@EnableBatchProcessing
 @EnableYarnBatchProcessing
 public class BatchAppmasterApplication {
-
-	@Autowired
-	private JobRepository jobRepository;
 
 	@Autowired
 	private JobBuilderFactory jobFactory;
@@ -52,34 +43,22 @@ public class BatchAppmasterApplication {
 	@Autowired
 	private StepBuilderFactory stepFactory;
 
-	@Autowired
-	private YarnAppmaster yarnAppmaster;
-
-//	public BatchAppmaster batchAppmaster() {
-//		return new BatchAppmaster();
-//	}
-
-	// {"-restart", "-next", "-stop", "-abandon"}
-
 	@Bean
 	public Job job() throws Exception {
 		return jobFactory.get("job")
-				.start(master1())
-				.next(master2())
+				.incrementer(jobParametersIncrementer())
+				.start(master())
 				.build();
 	}
 
 	@Bean
-	protected Step master1() throws Exception {
-		return stepFactory.get("master1")
-				.partitioner("remoteStep", partitioner())
-				.partitionHandler(partitionHandler())
-				.build();
+	public JobParametersIncrementer jobParametersIncrementer() {
+		return new RunIdIncrementer();
 	}
 
 	@Bean
-	protected Step master2() throws Exception {
-		return stepFactory.get("master2")
+	protected Step master() throws Exception {
+		return stepFactory.get("master")
 				.partitioner("remoteStep", partitioner())
 				.partitionHandler(partitionHandler())
 				.build();
@@ -92,11 +71,14 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	protected PartitionHandler partitionHandler() {
-		return new StaticBatchPartitionHandler((AbstractBatchAppmaster) yarnAppmaster, 2);
+		StaticBatchPartitionHandler handler = new StaticBatchPartitionHandler();
+		handler.setStepName("remoteStep");
+		handler.setGridSize(2);
+		return handler;
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(BatchAppmasterApplication.class, new String[]{"--spring.batch.job.enabled=false"});
+		SpringApplication.run(BatchAppmasterApplication.class, args);
 	}
 
 }

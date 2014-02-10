@@ -26,85 +26,34 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.api.records.ApplicationId;
-import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
-import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.junit.Test;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
-import org.springframework.yarn.client.YarnClient;
-import org.springframework.yarn.test.context.YarnCluster;
-import org.springframework.yarn.test.support.ClusterInfo;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
+import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests.EmptyConfig;
+import org.springframework.yarn.test.context.MiniYarnCluster;
+import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
+import org.springframework.yarn.test.junit.ApplicationInfo;
 import org.springframework.yarn.test.support.ContainerLogUtils;
-import org.springframework.yarn.test.support.YarnClusterManager;
 
-/**
- * Tests for multi context example. We're checking that
- * application status is ok and log files looks
- * what is expected.
- *
- * @author Janne Valkealahti
- *
- */
-public class BatchTests  {
-
-	public static class TestInitializer implements ApplicationContextInitializer {
-
-		Configuration configuration;
-
-		public TestInitializer(Configuration configuration) {
-			this.configuration = configuration;
-		}
-
-		@Override
-		public void initialize(ConfigurableApplicationContext applicationContext) {
-			applicationContext.getBeanFactory().registerSingleton("miniYarnConfiguration", configuration);
-		}
-
-	}
+@ContextConfiguration(loader = YarnDelegatingSmartContextLoader.class, classes = EmptyConfig.class)
+@MiniYarnCluster
+public class BatchTests extends AbstractBootYarnClusterTests {
 
 	@Test
 	public void testAppSubmission() throws Exception {
 
-		YarnClusterManager manager = YarnClusterManager.getInstance();
-		YarnCluster cluster = manager.getCluster(new ClusterInfo());
-		cluster.start();
-		Configuration configuration = cluster.getConfiguration();
-
-		String[] args = new String[]{
-				"--spring.yarn.fsUri="+configuration.get("fs.defaultFS"),
-				"--spring.yarn.rmAddress="+configuration.get("yarn.resourcemanager.address"),
-				"--spring.yarn.schedulerAddress="+configuration.get("yarn.resourcemanager.scheduler.address"),
+		String[] args = new String[] {
 				"--spring.yarn.client.files[0]=file:build/libs/batch-boot-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
-				"--spring.yarn.client.files[1]=file:build/libs/batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar"
-		};
+				"--spring.yarn.client.files[1]=file:build/libs/batch-boot-container-2.0.0.BUILD-SNAPSHOT.jar" };
 
-		System.out.println("ZZZZ: " + configuration.get("yarn.resourcemanager.scheduler.address"));
-		ConfigurableApplicationContext context = new SpringApplicationBuilder(BatchClientApplication.class)
-			.initializers(new TestInitializer(configuration))
-			.run(args);
+		ApplicationInfo info = submitApplicationAndWait(BatchClientApplication.class, args, 1, TimeUnit.MINUTES);
+		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
-		YarnClient client = context.getBean(YarnClient.class);
-		ApplicationId applicationId = client.submitApplication();
-		assertThat(applicationId, notNullValue());
-
-		YarnApplicationState waitState = waitState(client, applicationId, 70, TimeUnit.SECONDS, YarnApplicationState.FINISHED, YarnApplicationState.FAILED);
-		assertThat(waitState, is(YarnApplicationState.FINISHED));
-
-		List<Resource> resources = ContainerLogUtils.queryContainerLogs(cluster, applicationId);
-		manager.close();
-		context.close();
-
-
+		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
 		assertThat(resources, notNullValue());
-		assertThat(resources.size(), is(10));
+		assertThat(resources.size(), is(6));
 
 		for (Resource res : resources) {
 			File file = res.getFile();
@@ -116,7 +65,7 @@ public class BatchTests  {
 					String content = scanner.useDelimiter("\\A").next();
 					scanner.close();
 					// this is what container will log in stdout
-					assertThat(content, containsString("execute2: Hello"));
+					assertThat(content, containsString("PrintTasklet says Hello"));
 				}
 			} else if (file.getName().endsWith("stderr")) {
 				String content = "";
@@ -126,45 +75,9 @@ public class BatchTests  {
 					scanner.close();
 				}
 				// can't have anything in stderr files
-//				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
+				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
 			}
 		}
 	}
-
-	protected YarnApplicationState waitState(YarnClient yarnClient, ApplicationId applicationId, long timeout, TimeUnit unit, YarnApplicationState... applicationStates) throws Exception {
-		Assert.notNull(yarnClient, "Yarn client must be set");
-		Assert.notNull(applicationId, "ApplicationId must not be null");
-
-		YarnApplicationState state = null;
-		long end = System.currentTimeMillis() + unit.toMillis(timeout);
-
-		// break label for inner loop
-		done:
-		do {
-			state = findState(yarnClient, applicationId);
-			if (state == null) {
-				break;
-			}
-			for (YarnApplicationState stateCheck : applicationStates) {
-				if (state.equals(stateCheck)) {
-					break done;
-				}
-			}
-			Thread.sleep(1000);
-		} while (System.currentTimeMillis() < end);
-		return state;
-	}
-
-	private YarnApplicationState findState(YarnClient client, ApplicationId applicationId) {
-		YarnApplicationState state = null;
-		for (ApplicationReport report : client.listApplications()) {
-			if (report.getApplicationId().equals(applicationId)) {
-				state = report.getYarnApplicationState();
-				break;
-			}
-		}
-		return state;
-	}
-
 
 }

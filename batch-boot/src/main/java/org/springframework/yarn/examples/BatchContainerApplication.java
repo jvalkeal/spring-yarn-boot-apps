@@ -23,9 +23,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
-import org.springframework.yarn.container.YarnContainer;
 
 @Configuration
 @EnableAutoConfiguration
@@ -33,7 +31,7 @@ import org.springframework.yarn.container.YarnContainer;
 public class BatchContainerApplication {
 
 	@Autowired
-    private StepBuilderFactory steps;
+    private StepBuilderFactory stepBuilder;
 
 	@Bean
 	protected Tasklet tasklet() {
@@ -42,12 +40,10 @@ public class BatchContainerApplication {
 
 	@Bean
 	protected Step remoteStep() throws Exception {
-		return this.steps.get("remoteStep").tasklet(tasklet()).build();
-	}
-
-	@Bean(name=YarnSystemConstants.DEFAULT_ID_CONTAINER_CLASS)
-	public Class<? extends YarnContainer> yarnContainerClass() {
-		return BatchContainer.class;
+		return stepBuilder
+				.get("remoteStep")
+				.tasklet(tasklet())
+				.build();
 	}
 
 	public static void main(String[] args) {
