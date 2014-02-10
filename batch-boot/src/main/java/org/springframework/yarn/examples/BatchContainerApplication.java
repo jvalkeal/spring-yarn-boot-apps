@@ -31,7 +31,7 @@ import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
 public class BatchContainerApplication {
 
 	@Autowired
-    private StepBuilderFactory stepBuilder;
+	private StepBuilderFactory stepBuilder;
 
 	@Bean
 	protected Tasklet tasklet() {

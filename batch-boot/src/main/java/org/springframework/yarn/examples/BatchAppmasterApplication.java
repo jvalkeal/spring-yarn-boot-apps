@@ -58,7 +58,8 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	protected Step master() throws Exception {
-		return stepFactory.get("master")
+		return stepFactory
+				.get("master")
 				.partitioner("remoteStep", partitioner())
 				.partitionHandler(partitionHandler())
 				.build();
