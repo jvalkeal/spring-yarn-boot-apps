@@ -295,7 +295,6 @@ project('batch-restart-db-boot') {
 
 		runtime "log4j:log4j:$log4jVersion"
 		runtime "mysql:mysql-connector-java:5.1.23"
-
 		runtime "commons-dbcp:commons-dbcp:1.2.2"
 
 
