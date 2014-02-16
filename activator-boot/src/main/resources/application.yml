@@ -2,6 +2,10 @@ spring:
     yarn:
         appName: activator-boot
         applicationDir: /app/activator-sample/
+        security:
+            authMethod: kerberos
+            hdfsPrincipal: hdfs/neo@LOCALDOMAIN
+            yarnPrincipal: yarn/neo@LOCALDOMAIN
         fsUri: hdfs://localhost:8020
         rmAddress: localhost:8032
         schedulerAddress: localhost:8030
