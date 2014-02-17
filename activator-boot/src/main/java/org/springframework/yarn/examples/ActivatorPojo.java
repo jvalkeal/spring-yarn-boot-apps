@@ -15,10 +15,16 @@
  */
 package org.springframework.yarn.examples;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.yarn.annotation.OnYarnContainerStart;
@@ -46,6 +52,39 @@ public class ActivatorPojo {
 	public void publicVoidNoArgsMethod() {
 		log.info("Hello from ActivatorPojo");
 		log.info("Checking access to hdfs");
+
+
+//		String fileName = System.getenv("HADOOP_TOKEN_FILE_LOCATION");
+//		log.info("HADOOP_TOKEN_FILE_LOCATION: " + fileName);
+//		File file = new File(fileName);
+//		log.info("HADOOP_TOKEN_FILE_LOCATION file exists: " + file.exists());
+
+//		internalConfig.set("dfs.namenode.keytab.file", "/usr/local/hadoops/hdfs.keytab");
+
+
+//		UserGroupInformation.get
+
+//		try {
+//			// login using hdfs keytab works!!
+//			UserGroupInformation.loginUserFromKeytab("hdfs/neo@LOCALDOMAIN", "/usr/local/hadoops/hdfs.keytab");
+//
+//			Credentials readTokenStorageFile = Credentials.readTokenStorageFile(file, configuration);
+//			log.info("Credentials1:" + readTokenStorageFile);
+//			log.info("Executing with tokens1:");
+//		    for (Token<?> token: readTokenStorageFile.getAllTokens()) {
+//		    	log.info(token);
+//		    }
+//
+//			Credentials credentials = UserGroupInformation.getCurrentUser().getCredentials();
+//			log.info("Credentials2:" + credentials);
+//			log.info("Executing with tokens2:");
+//		    for (Token<?> token: credentials.getAllTokens()) {
+//		    	log.info(token);
+//		    }
+//		} catch (IOException e) {
+//			log.error("Error", e);
+//		}
+
 		listFiles();
 	}
 

@@ -4,8 +4,8 @@ spring:
         applicationDir: /app/activator-sample/
         security:
             authMethod: kerberos
-            hdfsPrincipal: hdfs/neo@LOCALDOMAIN
-            yarnPrincipal: yarn/neo@LOCALDOMAIN
+            userPrincipal: janne/neo@LOCALDOMAIN
+            userKeytab: /usr/local/hadoops/janne.keytab
         fsUri: hdfs://localhost:8020
         rmAddress: localhost:8032
         schedulerAddress: localhost:8030
