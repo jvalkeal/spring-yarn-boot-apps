@@ -9,6 +9,8 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
     yarn:
         batch:
+            enabled: true
+            name: job
             jobs:
               - name: job
                 enabled: true
@@ -21,9 +23,6 @@ spring:
                   : job1val1
                   ? job1key2
                   : job1val2
-            job:
-                enabled: true
-                name: job
         appName: batch-restart-db-boot
         applicationDir: /app/batch-restart-db-boot/
         fsUri: hdfs://localhost:8020

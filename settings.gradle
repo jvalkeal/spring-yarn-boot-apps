@@ -1,4 +1,5 @@
 rootProject.name = 'spring-yarn-boot-apps'
 
 include ':multi-context-boot',':batch-boot',':activator-boot',':batch-restart-db-boot'
+include ':test-multi-context-zip'
 

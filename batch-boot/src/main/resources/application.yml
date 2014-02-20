@@ -4,13 +4,21 @@ spring:
             enabled: false
     yarn:
         batch:
-            job:
-                enabled: true
-                name: job
+            enabled: true
+            name: job
             jobs:
               - name: job
                 enabled: true
                 next: true
+                parameters:
+                  ? job1key1
+                  : job1val1
+                  ? job1key2(long)
+                  : 123
+                  ? job1key3(double)
+                  : 123.123
+                  ? job1key4(date)
+                  : 2007/05/05
         appName: batch-boot
         applicationDir: /app/batch-boot/
         fsUri: hdfs://localhost:8020
