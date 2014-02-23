@@ -1,0 +1,15 @@
+spring:
+    yarn:
+        appName: test-staging-home
+        stagingDirectory: inhome
+        fsUri: hdfs://localhost:8020
+        rmAddress: localhost:8032
+        schedulerAddress: localhost:8030
+        client:
+            appmasterFile: test-staging-home-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+            files:
+              - "file:test-staging-home/build/libs/test-staging-home-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-staging-home/build/libs/test-staging-home-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+        appmaster:
+            containerCount: 1
+            containerFile: test-staging-home-container-2.0.0.BUILD-SNAPSHOT.jar
