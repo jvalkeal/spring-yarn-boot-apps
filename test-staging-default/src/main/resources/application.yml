@@ -2,13 +2,14 @@ spring:
     yarn:
         appName: test-staging-default
         fsUri: hdfs://localhost:8020
-        rmAddress: localhost:8032
-        schedulerAddress: localhost:8030
+        resourceManagerHost: localhost
         client:
-            appmasterFile: test-staging-default-appmaster-2.0.0.BUILD-SNAPSHOT.jar
             files:
               - "file:test-staging-default/build/libs/test-staging-default-container-2.0.0.BUILD-SNAPSHOT.jar"
               - "file:test-staging-default/build/libs/test-staging-default-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            launchcontext:
+                archiveFile: test-staging-default-appmaster-2.0.0.BUILD-SNAPSHOT.jar
         appmaster:
             containerCount: 1
-            containerFile: test-staging-default-container-2.0.0.BUILD-SNAPSHOT.jar
+            launchcontext:
+                archiveFile: test-staging-default-container-2.0.0.BUILD-SNAPSHOT.jar

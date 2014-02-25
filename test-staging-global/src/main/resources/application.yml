@@ -1,15 +1,16 @@
 spring:
     yarn:
         appName: test-staging-global
-        stagingDirectory: /tmp/test-staging-global
+        stagingDir: /tmp/test-staging-global
         fsUri: hdfs://localhost:8020
-        rmAddress: localhost:8032
-        schedulerAddress: localhost:8030
+        resourceManagerHost: localhost
         client:
-            appmasterFile: test-staging-global-appmaster-2.0.0.BUILD-SNAPSHOT.jar
             files:
               - "file:test-staging-global/build/libs/test-staging-global-container-2.0.0.BUILD-SNAPSHOT.jar"
               - "file:test-staging-global/build/libs/test-staging-global-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            launchcontext:
+                archiveFile: test-staging-global-appmaster-2.0.0.BUILD-SNAPSHOT.jar
         appmaster:
             containerCount: 1
-            containerFile: test-staging-global-container-2.0.0.BUILD-SNAPSHOT.jar
+            launchcontext:
+                archiveFile: test-staging-global-container-2.0.0.BUILD-SNAPSHOT.jar

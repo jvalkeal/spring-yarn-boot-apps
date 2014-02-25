@@ -1,0 +1,40 @@
+spring:
+    batch:
+        job:
+            enabled: false
+    datasource:
+        url: jdbc:mysql://localhost:3306/batch
+        username: batch
+        password: batch
+        driverClassName: com.mysql.jdbc.Driver
+    yarn:
+        batch:
+            enabled: true
+            name: job
+            jobs:
+              - name: job
+                enabled: true
+                next: true
+                failNext: false
+                restart: true
+                failRestart: false
+                parameters:
+                  ? job1key1
+                  : job1val1
+                  ? job1key2
+                  : job1val2
+        appName: test-batch-restart-db
+        applicationDir: /app/test-batch-restart-db/
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
+        client:
+            files:
+              - "file:test-batch-restart-db/build/libs/test-batch-restart-db-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-batch-restart-db/build/libs/test-batch-restart-db-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            launchcontext:
+                archiveFile: test-batch-restart-db-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+        appmaster:
+            keepContextAlive: false
+            containerCount: 2
+            launchcontext:
+                archiveFile: test-batch-restart-db-container-2.0.0.BUILD-SNAPSHOT.jar

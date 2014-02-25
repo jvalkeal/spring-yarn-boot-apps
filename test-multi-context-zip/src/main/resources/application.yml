@@ -3,17 +3,20 @@ spring:
         appName: test-multi-context-zip
         applicationDir: /app/test-multi-context-zip/
         fsUri: hdfs://localhost:8020
-        rmAddress: localhost:8032
-        schedulerAddress: localhost:8030
+        resourceManagerHost: localhost
         client:
-            appmasterFile: test-multi-context-zip-appmaster-2.0.0.BUILD-SNAPSHOT.zip
             files:
               - "file:test-multi-context-zip/build/libs/test-multi-context-zip-container-2.0.0.BUILD-SNAPSHOT.zip"
               - "file:test-multi-context-zip/build/libs/test-multi-context-zip-appmaster-2.0.0.BUILD-SNAPSHOT.zip"
-            localizerPatterns:
-              - "*.jar"
+            launchcontext:
+                archiveFile: test-multi-context-zip-appmaster-2.0.0.BUILD-SNAPSHOT.zip
+            localizer:
+                patterns:
+                  - "*.jar"
         appmaster:
             containerCount: 1
-            containerFile: test-multi-context-zip-container-2.0.0.BUILD-SNAPSHOT.zip
-            localizerPatterns:
-              - "*.jar"
+            launchcontext:
+                archiveFile: test-multi-context-zip-container-2.0.0.BUILD-SNAPSHOT.zip
+            localizer:
+                patterns:
+                  - "*.jar"

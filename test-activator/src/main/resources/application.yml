@@ -1,0 +1,22 @@
+spring:
+    yarn:
+        appName: test-activator
+        applicationDir: /app/test-activator/
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
+        client:
+            files:
+              - "file:test-activator/build/libs/test-activator-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-activator/build/libs/test-activator-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            resource:
+                memory: 500
+                virtualCores: 2
+            launchcontext:
+                archiveFile: test-activator-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+        appmaster:
+            containerCount: 2
+            appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
+            resource:
+                memory: 500
+            launchcontext:
+                archiveFile: test-activator-container-2.0.0.BUILD-SNAPSHOT.jar

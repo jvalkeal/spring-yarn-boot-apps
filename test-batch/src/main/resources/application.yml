@@ -1,0 +1,35 @@
+spring:
+    batch:
+        job:
+            enabled: false
+    yarn:
+        batch:
+            enabled: true
+            name: job
+            jobs:
+              - name: job
+                enabled: true
+                next: true
+                parameters:
+                  ? job1key1
+                  : job1val1
+                  ? job1key2(long)
+                  : 123
+                  ? job1key3(double)
+                  : 123.123
+                  ? job1key4(date)
+                  : 2007/05/05
+        appName: batch-boot
+        applicationDir: /app/test-batch/
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
+        client:
+            files:
+              - "file:test-batch/build/libs/test-batch-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-batch/build/libs/test-batch-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            launchcontext:
+                archiveFile: test-batch-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+        appmaster:
+            keepContextAlive: false
+            launchcontext:
+                archiveFile: test-batch-container-2.0.0.BUILD-SNAPSHOT.jar

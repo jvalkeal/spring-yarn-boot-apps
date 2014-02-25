@@ -188,7 +188,7 @@ subprojects { subproject ->
 }
 
 
-project('multi-context-boot') {
+project('test-multi-context') {
 
 	dependencies {
 
@@ -222,7 +222,7 @@ project('multi-context-boot') {
 
 }
 
-project('activator-boot') {
+project('test-activator') {
 
 	dependencies {
 
@@ -255,7 +255,7 @@ project('activator-boot') {
 
 }
 
-project('batch-boot') {
+project('test-batch') {
 
 	dependencies {
 		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
@@ -285,7 +285,7 @@ project('batch-boot') {
 
 }
 
-project('batch-restart-db-boot') {
+project('test-batch-restart-db') {
 
 	dependencies {
 		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
