@@ -1,9 +1,10 @@
 spring:
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
     yarn:
         appName: test-multi-context-zip
         applicationDir: /app/test-multi-context-zip/
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
         client:
             files:
               - "file:test-multi-context-zip/build/libs/test-multi-context-zip-container-2.0.0.BUILD-SNAPSHOT.zip"

@@ -1,9 +1,9 @@
 spring:
-    yarn:
-        appName: test-install-submit
-        xxxapplicationBaseDir: /apps/
+    hadoop:
         fsUri: hdfs://localhost:8020
         resourceManagerHost: localhost
+    yarn:
+        appName: test-install-submit
         client:
             files:
               - "file:test-install-submit/build/libs/test-install-submit-container-2.0.0.BUILD-SNAPSHOT.jar"

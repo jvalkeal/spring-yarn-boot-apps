@@ -7,6 +7,9 @@ spring:
         username: batch
         password: batch
         driverClassName: com.mysql.jdbc.Driver
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
     yarn:
         batch:
             enabled: true
@@ -25,8 +28,6 @@ spring:
                   : job1val2
         appName: test-batch-restart-db
         applicationDir: /app/test-batch-restart-db/
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
         client:
             files:
               - "file:test-batch-restart-db/build/libs/test-batch-restart-db-container-2.0.0.BUILD-SNAPSHOT.jar"

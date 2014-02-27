@@ -1,9 +1,10 @@
 spring:
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
     yarn:
         appName: test-multi-context
         applicationDir: /app/test-multi-context/
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
         client:
             files:
               - "file:test-multi-context/build/libs/test-multi-context-container-2.0.0.BUILD-SNAPSHOT.jar"

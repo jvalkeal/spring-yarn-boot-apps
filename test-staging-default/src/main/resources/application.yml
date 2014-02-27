@@ -1,8 +1,9 @@
 spring:
-    yarn:
-        appName: test-staging-default
+    hadoop:
         fsUri: hdfs://localhost:8020
         resourceManagerHost: localhost
+    yarn:
+        appName: test-staging-default
         client:
             files:
               - "file:test-staging-default/build/libs/test-staging-default-container-2.0.0.BUILD-SNAPSHOT.jar"

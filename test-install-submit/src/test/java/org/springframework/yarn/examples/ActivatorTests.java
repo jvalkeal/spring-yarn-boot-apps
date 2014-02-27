@@ -22,18 +22,13 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
@@ -57,16 +52,16 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 	public void testAppInstallSubmit() throws Exception {
 
 		String[] args = new String[] {
-				"--spring.yarn.fsUri=" + getConfiguration().get("fs.defaultFS"),
-				"--spring.yarn.resourceManagerHost=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[0],
-				"--spring.yarn.resourceManagerPort=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[1],
+				"--spring.hadoop.fsUri=" + getConfiguration().get("fs.defaultFS"),
+				"--spring.hadoop.resourceManagerHost=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[0],
+				"--spring.hadoop.resourceManagerPort=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[1],
 				"--spring.yarn.client.files[0]=file:build/libs/test-install-submit-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
 				"--spring.yarn.client.files[1]=file:build/libs/test-install-submit-container-2.0.0.BUILD-SNAPSHOT.jar" };
 		Properties appProperties = new Properties();
 		appProperties.setProperty("spring.yarn.applicationDir", "/apps/foo-1/");
 		YarnBootClientInstallApplication installApp = new YarnBootClientInstallApplication();
 		installApp.appId("foo-1");
-		installApp.applicationsBaseDir("/apps/");
+		installApp.applicationBaseDir("/apps/");
 		installApp.configFile("application.properties", appProperties);
 		installApp.run(args);
 		listFiles();
@@ -74,10 +69,10 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 
 		args = new String[] {
 				"--spring.yarn.applicationDir=/apps/foo-1/",
-				"--spring.yarn.fsUri=" + getConfiguration().get("fs.defaultFS"),
-				"--spring.yarn.resourceManagerHost=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[0],
-				"--spring.yarn.resourceManagerPort=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[1],
-				"--spring.yarn.resourceManagerSchedulerPort=" + getConfiguration().get("yarn.resourcemanager.scheduler.address").split(":")[1]};
+				"--spring.hadoop.fsUri=" + getConfiguration().get("fs.defaultFS"),
+				"--spring.hadoop.resourceManagerHost=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[0],
+				"--spring.hadoop.resourceManagerPort=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[1],
+				"--spring.hadoop.resourceManagerSchedulerPort=" + getConfiguration().get("yarn.resourcemanager.scheduler.address").split(":")[1]};
 		YarnBootClientSubmitApplication submitApp = new YarnBootClientSubmitApplication();
 		submitApp.appId("foo-1");
 		ApplicationId applicationId = submitApp.run(args);

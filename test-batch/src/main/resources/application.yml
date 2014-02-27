@@ -2,6 +2,9 @@ spring:
     batch:
         job:
             enabled: false
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
     yarn:
         batch:
             enabled: true
@@ -21,8 +24,6 @@ spring:
                   : 2007/05/05
         appName: batch-boot
         applicationDir: /app/test-batch/
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
         client:
             files:
               - "file:test-batch/build/libs/test-batch-container-2.0.0.BUILD-SNAPSHOT.jar"

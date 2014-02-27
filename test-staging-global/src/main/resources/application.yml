@@ -1,9 +1,10 @@
 spring:
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
     yarn:
         appName: test-staging-global
         stagingDir: /tmp/test-staging-global
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
         client:
             files:
               - "file:test-staging-global/build/libs/test-staging-global-container-2.0.0.BUILD-SNAPSHOT.jar"

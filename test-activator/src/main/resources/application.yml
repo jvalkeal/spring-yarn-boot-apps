@@ -1,9 +1,10 @@
 spring:
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
     yarn:
         appName: test-activator
         applicationDir: /app/test-activator/
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
         client:
             files:
               - "file:test-activator/build/libs/test-activator-container-2.0.0.BUILD-SNAPSHOT.jar"
