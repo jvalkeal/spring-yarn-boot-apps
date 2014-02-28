@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
@@ -44,8 +45,8 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				"--spring.yarn.client.files[1]=file:build/libs/test-container-launch-failure-container-2.0.0.BUILD-SNAPSHOT.jar" };
 
 		ApplicationInfo info = submitApplicationAndWait(ActivatorClientApplication.class, args, 1, TimeUnit.MINUTES);
-		// TODO: add check for app final status after test system supports it.
 		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
+		assertThat(info.getFinalApplicationStatus(), is(FinalApplicationStatus.FAILED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
 		assertThat(resources, notNullValue());
