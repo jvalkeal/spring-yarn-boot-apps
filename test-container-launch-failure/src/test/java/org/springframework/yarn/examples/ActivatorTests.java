@@ -23,22 +23,17 @@ import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
-import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests.EmptyConfig;
-import org.springframework.yarn.test.context.MiniYarnCluster;
-import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
+import org.springframework.yarn.test.context.MiniYarnClusterTest;
 import org.springframework.yarn.test.junit.ApplicationInfo;
 import org.springframework.yarn.test.support.ContainerLogUtils;
 
-@ContextConfiguration(loader = YarnDelegatingSmartContextLoader.class, classes = EmptyConfig.class)
-@MiniYarnCluster
+@MiniYarnClusterTest
 public class ActivatorTests extends AbstractBootYarnClusterTests {
 
 	@Test
@@ -49,6 +44,7 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				"--spring.yarn.client.files[1]=file:build/libs/test-container-launch-failure-container-2.0.0.BUILD-SNAPSHOT.jar" };
 
 		ApplicationInfo info = submitApplicationAndWait(ActivatorClientApplication.class, args, 1, TimeUnit.MINUTES);
+		// TODO: add check for app final status after test system supports it.
 		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
@@ -58,13 +54,14 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 		for (Resource res : resources) {
 			File file = res.getFile();
 			String content = ContainerLogUtils.getFileContent(file);
-			if (file.getName().endsWith("stdout")) {
+			if (file.getName().endsWith("Appmaster.stdout")) {
 				assertThat(file.length(), greaterThan(0l));
-				if (file.getName().equals("Container.stdout")) {
-					assertThat(content, containsString("Hello from ActivatorPojo"));
-				}
-			} else if (file.getName().endsWith("stderr")) {
+			} else if (file.getName().endsWith("Appmaster.stderr")) {
 				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
+			} else if (file.getName().endsWith("Container.stdout")) {
+				assertThat("stdout file is not empty: " + content, file.length(), is(0l));
+			} else if (file.getName().endsWith("Container.stderr")) {
+				assertThat(content, containsString("Unable to access jarfile"));
 			}
 		}
 	}

@@ -17,11 +17,9 @@ package org.springframework.yarn.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.YarnSystemConstants;
-import org.springframework.yarn.container.YarnContainer;
 
 /**
  * Multi context container definition for Spring Boot Application.
