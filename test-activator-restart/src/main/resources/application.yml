@@ -1,0 +1,21 @@
+spring:
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
+    yarn:
+        appName: test-activator-restart
+        applicationDir: /app/test-activator-restart/
+        client:
+            files:
+              - "file:test-activator/build/libs/test-activator-restart-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-activator/build/libs/test-activator-restart-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            resource:
+                memory: 500
+            launchcontext:
+                archiveFile: test-activator-restart-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+        appmaster:
+            appmasterClass: org.springframework.yarn.examples.CustomAppmaster
+            resource:
+                memory: 500
+            launchcontext:
+                archiveFile: test-activator-restart-container-2.0.0.BUILD-SNAPSHOT.jar
