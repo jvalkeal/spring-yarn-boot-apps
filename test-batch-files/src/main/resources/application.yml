@@ -1,0 +1,30 @@
+spring:
+    batch:
+        job:
+            enabled: false
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
+    yarn:
+        batch:
+            enabled: true
+            name: job
+            jobs:
+              - name: job
+                enabled: true
+                next: true
+                parameters:
+                  ? input
+                  : "/syarn-tmp/batch-files/set1/*"
+        appName: test-batch-files
+        applicationDir: /app/test-batch-files/
+        client:
+            files:
+              - "file:test-batch/build/libs/test-batch-files-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-batch/build/libs/test-batch-files-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+            launchcontext:
+                archiveFile: test-batch-files-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+        appmaster:
+            keepContextAlive: false
+            launchcontext:
+                archiveFile: test-batch-files-container-2.0.0.BUILD-SNAPSHOT.jar
