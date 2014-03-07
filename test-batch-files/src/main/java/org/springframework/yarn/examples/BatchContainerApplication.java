@@ -15,11 +15,10 @@
  */
 package org.springframework.yarn.examples;
 
+import org.apache.hadoop.fs.Path;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +26,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.fs.HdfsResourceLoader;
+import org.springframework.data.hadoop.store.input.TextFileReader;
+import org.springframework.data.hadoop.store.split.FileInputSplit;
 import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
-import org.springframework.yarn.batch.item.HdfsFileSplitItemReader;
+import org.springframework.yarn.batch.item.DataStoreItemReader;
 import org.springframework.yarn.batch.item.PassThroughLineDataMapper;
 
 @Configuration
@@ -45,36 +44,28 @@ public class BatchContainerApplication {
 	private org.apache.hadoop.conf.Configuration configuration;
 
 	@Bean
-	protected Tasklet tasklet() {
-		return new PrintTasklet("Hello");
-	}
-
-	@Bean
 	protected Step remoteStep() throws Exception {
 		return stepBuilder
 				.get("remoteStep")
 				.<String,String>chunk(1000)
-				.reader(itemReader(null, null))
+				.reader(itemReader(null, null, null))
 				.writer(itemWriter())
 				.build();
 	}
 
-	// we can't return it as ItemReader, open not called then!!
-
 	@Bean
 	@StepScope
-	protected HdfsFileSplitItemReader<String> itemReader(
-//			@Value("#{stepExecutionContext['fileName']}") Resource fileName,
+	protected DataStoreItemReader<String> itemReader(
+			@Value("#{stepExecutionContext['fileName']}") String fileName,
 			@Value("#{stepExecutionContext['splitStart']}") Long splitStart,
 			@Value("#{stepExecutionContext['splitLength']}") Long splitLength
 			) {
-		HdfsFileSplitItemReader<String> itemReader = new HdfsFileSplitItemReader<String>();
-		HdfsResourceLoader loader = new HdfsResourceLoader(configuration);
-		Resource resource = loader.getResource("/syarn-tmp/batch-files/set1/data.txt");
+		FileInputSplit inputSplit = new FileInputSplit(splitStart, splitLength, null);
+		TextFileReader textFileReader = new TextFileReader(configuration, new Path(fileName), null, inputSplit, null);
 
-		itemReader.setResource(resource);
-		itemReader.setSplitStart(splitStart);
-		itemReader.setSplitLength(splitLength);
+		DataStoreItemReader<String> itemReader = new DataStoreItemReader<String>();
+		itemReader.setDataStoreReader(textFileReader);
+
 		itemReader.setLineDataMapper(new PassThroughLineDataMapper());
 		return itemReader;
 	}
