@@ -15,6 +15,10 @@
  */
 package org.springframework.yarn.examples;
 
+import static org.springframework.yarn.batch.BatchSystemConstants.SEC_SPEL_KEY_FILENAME;
+import static org.springframework.yarn.batch.BatchSystemConstants.SEC_SPEL_KEY_SPLITLENGTH;
+import static org.springframework.yarn.batch.BatchSystemConstants.SEC_SPEL_KEY_SPLITSTART;
+
 import org.apache.hadoop.fs.Path;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -56,9 +60,9 @@ public class BatchContainerApplication {
 	@Bean
 	@StepScope
 	protected DataStoreItemReader<String> itemReader(
-			@Value("#{stepExecutionContext['fileName']}") String fileName,
-			@Value("#{stepExecutionContext['splitStart']}") Long splitStart,
-			@Value("#{stepExecutionContext['splitLength']}") Long splitLength
+			@Value(SEC_SPEL_KEY_FILENAME) String fileName,
+			@Value(SEC_SPEL_KEY_SPLITSTART) Long splitStart,
+			@Value(SEC_SPEL_KEY_SPLITLENGTH) Long splitLength
 			) {
 		FileInputSplit inputSplit = new FileInputSplit(splitStart, splitLength, null);
 		TextFileReader textFileReader = new TextFileReader(configuration, new Path(fileName), null, inputSplit, null);

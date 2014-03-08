@@ -30,7 +30,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
-import org.springframework.yarn.batch.partition.StaticBatchPartitionHandler;
+import org.springframework.yarn.batch.partition.StaticPartitionHandler;
 
 @Configuration
 @EnableAutoConfiguration
@@ -72,7 +72,7 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	protected PartitionHandler partitionHandler() {
-		StaticBatchPartitionHandler handler = new StaticBatchPartitionHandler();
+		StaticPartitionHandler handler = new StaticPartitionHandler();
 		handler.setStepName("remoteStep");
 		handler.setGridSize(2);
 		return handler;

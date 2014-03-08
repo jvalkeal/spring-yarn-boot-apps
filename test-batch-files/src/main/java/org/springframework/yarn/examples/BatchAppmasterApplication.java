@@ -34,10 +34,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
+import org.springframework.data.hadoop.store.split.FileInputSplitter;
 import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.batch.BatchSystemConstants;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
-import org.springframework.yarn.batch.partition.HdfsSplitBatchPartitionHandler;
-import org.springframework.yarn.batch.partition.MultiHdfsResourcePartitioner;
+import org.springframework.yarn.batch.partition.HdfsPartitionHandler;
+import org.springframework.yarn.batch.partition.InputSplitterPartitioner;
 
 @Configuration
 @EnableAutoConfiguration
@@ -80,22 +82,17 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	@StepScope
-	protected Partitioner partitioner(@Value("#{jobParameters['input']}") String input) throws IOException {
-		MultiHdfsResourcePartitioner partitioner = new MultiHdfsResourcePartitioner();
-
-		HdfsResourceLoader loader = new HdfsResourceLoader(configuration);
-		Resource[] resources = loader.getResources(input);
-		partitioner.setResources(resources);
-
-		partitioner.setSplitSize(2);
-		partitioner.setForceSplit(true);
+	protected Partitioner partitioner(@Value(BatchSystemConstants.JP_SPEL_KEY_INPUTPATTERNS) String inputPatterns) throws IOException {
+		InputSplitterPartitioner partitioner = new InputSplitterPartitioner();
+		partitioner.setInputSplitter(new FileInputSplitter(configuration));
 		partitioner.setConfiguration(configuration);
+		partitioner.setInputPatterns(inputPatterns);
 		return partitioner;
 	}
 
 	@Bean
 	protected PartitionHandler partitionHandler() {
-		HdfsSplitBatchPartitionHandler handler = new HdfsSplitBatchPartitionHandler();
+		HdfsPartitionHandler handler = new HdfsPartitionHandler();
 		handler.setStepName("remoteStep");
 		handler.setConfiguration(configuration);
 		return handler;

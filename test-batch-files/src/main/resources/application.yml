@@ -3,8 +3,8 @@ spring:
         job:
             enabled: false
     hadoop:
-        fsUri: hdfs://localhost:8020
-        resourceManagerHost: localhost
+        fsUri: hdfs://node1:8020
+        resourceManagerHost: node1
     yarn:
         batch:
             enabled: true
@@ -14,16 +14,17 @@ spring:
                 enabled: true
                 next: true
                 parameters:
-                  ? input
+                  ? inputPatterns
                   : "/syarn-tmp/batch-files/set1/*"
         appName: test-batch-files
         applicationDir: /app/test-batch-files/
         client:
             files:
-              - "file:test-batch/build/libs/test-batch-files-container-2.0.0.BUILD-SNAPSHOT.jar"
-              - "file:test-batch/build/libs/test-batch-files-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-batch-files/build/libs/test-batch-files-container-2.0.0.BUILD-SNAPSHOT.jar"
+              - "file:test-batch-files/build/libs/test-batch-files-appmaster-2.0.0.BUILD-SNAPSHOT.jar"
             launchcontext:
                 archiveFile: test-batch-files-appmaster-2.0.0.BUILD-SNAPSHOT.jar
+                includeSystemEnv: false
         appmaster:
             keepContextAlive: false
             launchcontext:
