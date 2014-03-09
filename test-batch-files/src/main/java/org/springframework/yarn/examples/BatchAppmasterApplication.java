@@ -32,14 +32,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.fs.HdfsResourceLoader;
-import org.springframework.data.hadoop.store.split.FileInputSplitter;
-import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.data.hadoop.store.split.FileSplitter;
+import org.springframework.data.hadoop.store.split.Splitter;
 import org.springframework.yarn.batch.BatchSystemConstants;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
 import org.springframework.yarn.batch.partition.HdfsPartitionHandler;
-import org.springframework.yarn.batch.partition.InputSplitterPartitioner;
+import org.springframework.yarn.batch.partition.SplitterPartitioner;
 
 @Configuration
 @EnableAutoConfiguration
@@ -51,12 +49,6 @@ public class BatchAppmasterApplication {
 
 	@Autowired
 	private StepBuilderFactory stepFactory;
-
-	@Autowired
-	private org.apache.hadoop.conf.Configuration configuration;
-
-	@Autowired
-	private YarnAppmaster yarnAppmaster;
 
 	@Bean
 	public Job job() throws Exception {
@@ -82,19 +74,24 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	@StepScope
-	protected Partitioner partitioner(@Value(BatchSystemConstants.JP_SPEL_KEY_INPUTPATTERNS) String inputPatterns) throws IOException {
-		InputSplitterPartitioner partitioner = new InputSplitterPartitioner();
-		partitioner.setInputSplitter(new FileInputSplitter(configuration));
-		partitioner.setConfiguration(configuration);
+	protected Partitioner partitioner(
+			@Value(BatchSystemConstants.JP_SPEL_KEY_INPUTPATTERNS) String inputPatterns
+			) throws IOException {
+		SplitterPartitioner partitioner = new SplitterPartitioner();
+		partitioner.setSplitter(splitter());
 		partitioner.setInputPatterns(inputPatterns);
 		return partitioner;
+	}
+
+	@Bean
+	protected Splitter splitter() {
+		return new FileSplitter();
 	}
 
 	@Bean
 	protected PartitionHandler partitionHandler() {
 		HdfsPartitionHandler handler = new HdfsPartitionHandler();
 		handler.setStepName("remoteStep");
-		handler.setConfiguration(configuration);
 		return handler;
 	}
 

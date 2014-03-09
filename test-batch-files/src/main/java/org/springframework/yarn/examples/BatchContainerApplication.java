@@ -30,8 +30,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.hadoop.store.DataStoreReader;
 import org.springframework.data.hadoop.store.input.TextFileReader;
-import org.springframework.data.hadoop.store.split.FileInputSplit;
+import org.springframework.data.hadoop.store.split.FileSplit;
+import org.springframework.data.hadoop.store.split.Split;
 import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
 import org.springframework.yarn.batch.item.DataStoreItemReader;
 import org.springframework.yarn.batch.item.PassThroughLineDataMapper;
@@ -64,12 +66,10 @@ public class BatchContainerApplication {
 			@Value(SEC_SPEL_KEY_SPLITSTART) Long splitStart,
 			@Value(SEC_SPEL_KEY_SPLITLENGTH) Long splitLength
 			) {
-		FileInputSplit inputSplit = new FileInputSplit(splitStart, splitLength, null);
-		TextFileReader textFileReader = new TextFileReader(configuration, new Path(fileName), null, inputSplit, null);
-
+		Split split = new FileSplit(splitStart, splitLength, null);
+		DataStoreReader<String> reader = new TextFileReader(configuration, new Path(fileName), null, split, null);
 		DataStoreItemReader<String> itemReader = new DataStoreItemReader<String>();
-		itemReader.setDataStoreReader(textFileReader);
-
+		itemReader.setDataStoreReader(reader);
 		itemReader.setLineDataMapper(new PassThroughLineDataMapper());
 		return itemReader;
 	}
