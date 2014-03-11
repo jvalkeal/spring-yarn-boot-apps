@@ -15,7 +15,6 @@
  */
 package org.springframework.yarn.examples;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,7 +58,7 @@ public class BatchTests extends AbstractBootYarnClusterTests {
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());
 		assertThat(resources, notNullValue());
-//		assertThat(resources.size(), is(8));
+		assertThat(resources.size(), is(8));
 
 		int linesFound = 0;
 		HashSet<String> linesUnique = new HashSet<String>(300);

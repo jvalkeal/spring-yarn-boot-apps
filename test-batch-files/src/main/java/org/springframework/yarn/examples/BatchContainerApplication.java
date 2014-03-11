@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.hadoop.store.DataStoreReader;
 import org.springframework.data.hadoop.store.input.TextFileReader;
-import org.springframework.data.hadoop.store.split.FileSplit;
+import org.springframework.data.hadoop.store.split.GenericSplit;
 import org.springframework.data.hadoop.store.split.Split;
 import org.springframework.yarn.batch.config.EnableYarnRemoteBatchProcessing;
 import org.springframework.yarn.batch.item.DataStoreItemReader;
@@ -66,7 +66,7 @@ public class BatchContainerApplication {
 			@Value(SEC_SPEL_KEY_SPLITSTART) Long splitStart,
 			@Value(SEC_SPEL_KEY_SPLITLENGTH) Long splitLength
 			) {
-		Split split = new FileSplit(splitStart, splitLength, null);
+		Split split = new GenericSplit(splitStart, splitLength, null);
 		DataStoreReader<String> reader = new TextFileReader(configuration, new Path(fileName), null, split, null);
 		DataStoreItemReader<String> itemReader = new DataStoreItemReader<String>();
 		itemReader.setDataStoreReader(reader);

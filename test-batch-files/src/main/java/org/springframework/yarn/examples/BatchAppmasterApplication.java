@@ -32,11 +32,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.store.split.FileSplitter;
 import org.springframework.data.hadoop.store.split.Splitter;
+import org.springframework.data.hadoop.store.split.StaticLengthSplitter;
 import org.springframework.yarn.batch.BatchSystemConstants;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
-import org.springframework.yarn.batch.partition.HdfsPartitionHandler;
+import org.springframework.yarn.batch.partition.SplitterPartitionHandler;
 import org.springframework.yarn.batch.partition.SplitterPartitioner;
 
 @Configuration
@@ -85,12 +85,13 @@ public class BatchAppmasterApplication {
 
 	@Bean
 	protected Splitter splitter() {
-		return new FileSplitter();
+		StaticLengthSplitter splitter = new StaticLengthSplitter(1000);
+		return splitter;
 	}
 
 	@Bean
 	protected PartitionHandler partitionHandler() {
-		HdfsPartitionHandler handler = new HdfsPartitionHandler();
+		SplitterPartitionHandler handler = new SplitterPartitionHandler();
 		handler.setStepName("remoteStep");
 		return handler;
 	}
