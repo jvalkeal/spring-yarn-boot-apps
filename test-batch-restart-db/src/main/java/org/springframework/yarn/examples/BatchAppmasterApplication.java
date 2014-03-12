@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.batch.am.BatchYarnAppmaster;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
-import org.springframework.yarn.batch.partition.StaticBatchPartitionHandler;
+import org.springframework.yarn.batch.partition.StaticPartitionHandler;
 
 @Configuration
 @EnableAutoConfiguration
@@ -84,7 +84,7 @@ public class BatchAppmasterApplication {
 	}
 
 	protected PartitionHandler partitionHandler(String stepName) {
-		StaticBatchPartitionHandler handler = new StaticBatchPartitionHandler((BatchYarnAppmaster)yarnAppmaster);
+		StaticPartitionHandler handler = new StaticPartitionHandler((BatchYarnAppmaster)yarnAppmaster);
 		handler.setStepName(stepName);
 		handler.setGridSize(2);
 		return handler;
