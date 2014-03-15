@@ -5,6 +5,7 @@ spring:
     yarn:
         appName: test-install-submit
         client:
+            clientClass: org.springframework.yarn.client.DefaultApplicationYarnClient
             files:
               - "file:test-install-submit/build/libs/test-install-submit-container-2.0.0.BUILD-SNAPSHOT.jar"
               - "file:test-install-submit/build/libs/test-install-submit-appmaster-2.0.0.BUILD-SNAPSHOT.jar"

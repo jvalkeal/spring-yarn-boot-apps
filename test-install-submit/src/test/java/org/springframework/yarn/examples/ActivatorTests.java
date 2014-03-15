@@ -25,11 +25,13 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.FsShell;
@@ -38,6 +40,8 @@ import org.springframework.yarn.boot.app.YarnBootClientInstallApplication;
 import org.springframework.yarn.boot.app.YarnBootClientSubmitApplication;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests.EmptyConfig;
+import org.springframework.yarn.client.YarnClient;
+import org.springframework.yarn.client.YarnClientFactoryBean;
 import org.springframework.yarn.test.context.MiniYarnCluster;
 import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
 import org.springframework.yarn.test.support.ContainerLogUtils;
@@ -51,36 +55,39 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 	@Test
 	public void testAppInstallSubmit() throws Exception {
 
-		String[] args = new String[] {
+		String ID = "foo-1";
+		String BASE = "/apps/";
+		setYarnClient(buildYarnClient());
+
+		String[] installAppArgs = new String[] {
 				"--spring.hadoop.fsUri=" + getConfiguration().get("fs.defaultFS"),
-				"--spring.hadoop.resourceManagerHost=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[0],
-				"--spring.hadoop.resourceManagerPort=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[1],
+				"--spring.hadoop.resourceManagerAddress=" + getConfiguration().get("yarn.resourcemanager.address"),
 				"--spring.yarn.client.files[0]=file:build/libs/test-install-submit-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
-				"--spring.yarn.client.files[1]=file:build/libs/test-install-submit-container-2.0.0.BUILD-SNAPSHOT.jar" };
+				"--spring.yarn.client.files[1]=file:build/libs/test-install-submit-container-2.0.0.BUILD-SNAPSHOT.jar"
+				};
 		Properties appProperties = new Properties();
-		appProperties.setProperty("spring.yarn.applicationDir", "/apps/foo-1/");
+		appProperties.setProperty("spring.yarn.applicationDir", BASE + ID + "/");
 		YarnBootClientInstallApplication installApp = new YarnBootClientInstallApplication();
-		installApp.appId("foo-1");
-		installApp.applicationBaseDir("/apps/");
+		installApp.appId(ID);
+		installApp.applicationBaseDir(BASE);
 		installApp.configFile("application.properties", appProperties);
-		installApp.run(args);
+		installApp.run(installAppArgs);
 		listFiles();
-		catFile("/apps/foo-1/application.properties");
+		catFile(BASE + ID + "/application.properties");
 
-		args = new String[] {
-				"--spring.yarn.applicationDir=/apps/foo-1/",
+		String[] submitAppArgs = new String[] {
+				"--spring.yarn.applicationDir=" + BASE + ID + "/",
 				"--spring.hadoop.fsUri=" + getConfiguration().get("fs.defaultFS"),
-				"--spring.hadoop.resourceManagerHost=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[0],
-				"--spring.hadoop.resourceManagerPort=" + getConfiguration().get("yarn.resourcemanager.address").split(":")[1],
-				"--spring.hadoop.resourceManagerSchedulerPort=" + getConfiguration().get("yarn.resourcemanager.scheduler.address").split(":")[1]};
+				"--spring.hadoop.resourceManagerAddress=" + getConfiguration().get("yarn.resourcemanager.address"),
+				"--spring.hadoop.resourceManagerSchedulerAddress=" + getConfiguration().get("yarn.resourcemanager.scheduler.address")
+				};
 		YarnBootClientSubmitApplication submitApp = new YarnBootClientSubmitApplication();
-		submitApp.appId("foo-1");
-		ApplicationId applicationId = submitApp.run(args);
+		submitApp.appId(ID);
+		submitApp.applicationBaseDir(BASE);
+		ApplicationId applicationId = submitApp.run(submitAppArgs);
 
-		Thread.sleep(60000);
-		// TODO: should make this easier to test
-//		YarnApplicationState state = waitState(applicationId, 1, TimeUnit.MINUTES, YarnApplicationState.FINISHED);
-//		assertThat(state, is(YarnApplicationState.FINISHED));
+		YarnApplicationState state = waitState(applicationId, 1, TimeUnit.MINUTES, YarnApplicationState.FINISHED);
+		assertThat(state, is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), applicationId);
 		assertThat(resources, notNullValue());
@@ -116,5 +123,13 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 			log.info(t);
 		}
 	}
+
+	private YarnClient buildYarnClient() throws Exception {
+		YarnClientFactoryBean factory = new YarnClientFactoryBean();
+		factory.setConfiguration(getConfiguration());
+		factory.afterPropertiesSet();
+		return factory.getObject();
+	}
+
 
 }
