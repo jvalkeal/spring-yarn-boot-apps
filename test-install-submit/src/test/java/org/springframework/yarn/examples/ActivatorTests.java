@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -36,8 +37,8 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.yarn.boot.app.YarnBootClientInstallApplication;
-import org.springframework.yarn.boot.app.YarnBootClientSubmitApplication;
+import org.springframework.yarn.boot.app.YarnInstallApplication;
+import org.springframework.yarn.boot.app.YarnSubmitApplication;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests.EmptyConfig;
 import org.springframework.yarn.client.YarnClient;
@@ -67,7 +68,7 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				};
 		Properties appProperties = new Properties();
 		appProperties.setProperty("spring.yarn.applicationDir", BASE + ID + "/");
-		YarnBootClientInstallApplication installApp = new YarnBootClientInstallApplication();
+		YarnInstallApplication installApp = new YarnInstallApplication();
 		installApp.appId(ID);
 		installApp.applicationBaseDir(BASE);
 		installApp.configFile("application.properties", appProperties);
@@ -81,7 +82,7 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				"--spring.hadoop.resourceManagerAddress=" + getConfiguration().get("yarn.resourcemanager.address"),
 				"--spring.hadoop.resourceManagerSchedulerAddress=" + getConfiguration().get("yarn.resourcemanager.scheduler.address")
 				};
-		YarnBootClientSubmitApplication submitApp = new YarnBootClientSubmitApplication();
+		YarnSubmitApplication submitApp = new YarnSubmitApplication();
 		submitApp.appId(ID);
 		submitApp.applicationBaseDir(BASE);
 		ApplicationId applicationId = submitApp.run(submitAppArgs);
@@ -121,6 +122,10 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 		log.info("XXX cat files");
 		for (String t : text) {
 			log.info(t);
+		}
+		try {
+			shell.close();
+		} catch (IOException e) {
 		}
 	}
 
