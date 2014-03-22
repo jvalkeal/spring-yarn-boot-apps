@@ -160,6 +160,7 @@ subprojects { subproject ->
 
 	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
 		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
 	}
 
 	task appmasterBootZip(type: BootRepackage, dependsOn: appmasterZip) {

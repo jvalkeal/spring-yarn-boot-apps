@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.yarn.boot.app.YarnInstallApplication;
+import org.springframework.yarn.boot.app.YarnPushApplication;
 import org.springframework.yarn.boot.app.YarnSubmitApplication;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests.EmptyConfig;
@@ -68,8 +68,8 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				};
 		Properties appProperties = new Properties();
 		appProperties.setProperty("spring.yarn.applicationDir", BASE + ID + "/");
-		YarnInstallApplication installApp = new YarnInstallApplication();
-		installApp.appId(ID);
+		YarnPushApplication installApp = new YarnPushApplication();
+		installApp.applicationVersion(ID);
 		installApp.applicationBaseDir(BASE);
 		installApp.configFile("application.properties", appProperties);
 		installApp.run(installAppArgs);
@@ -83,7 +83,7 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				"--spring.hadoop.resourceManagerSchedulerAddress=" + getConfiguration().get("yarn.resourcemanager.scheduler.address")
 				};
 		YarnSubmitApplication submitApp = new YarnSubmitApplication();
-		submitApp.appId(ID);
+		submitApp.applicationVersion(ID);
 		submitApp.applicationBaseDir(BASE);
 		ApplicationId applicationId = submitApp.run(submitAppArgs);
 
