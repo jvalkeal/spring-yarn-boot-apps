@@ -86,7 +86,6 @@ subprojects { subproject ->
 		classifier = 'sources'
 	}
 
-
 	springBoot {
 		backupSource = true
 		//providedConfiguration = 'hadoopprovided'
@@ -145,46 +144,13 @@ subprojects { subproject ->
 		exclude('**/*Container*')
 	}
 
-	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
-		withJarTask = clientJar
-	}
-
-	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
-		withJarTask = containerJar
-	}
-
-	task containerBootZip(type: BootRepackage, dependsOn: containerZip) {
-		customConfiguration = "hadoopruntime"
-		withJarTask = containerZip
-	}
-
-	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
-		withJarTask = appmasterJar
-		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
-	}
-
-	task appmasterBootZip(type: BootRepackage, dependsOn: appmasterZip) {
-		customConfiguration = "hadoopruntime"
-		withJarTask = appmasterZip
-	}
-
-	//assemble.dependsOn = ['jar', 'testJar']
 	assemble.dependsOn(testJar)
 
 	clean.doLast {ant.delete(dir: "target")}
 
 	jar.enabled = false
 	bootRepackage.enabled = false
-	//bootRepackage.withJarTask = jar
 
-	task bootJars
-	bootJars.dependsOn = [clientBoot,containerBootJar,containerBootZip,appmasterBootJar,appmasterBootZip]
-
-	//build.dependsOn(clientBoot)
-	//build.dependsOn(containerBoot)
-	//build.dependsOn(appmasterBoot)
-	//test.dependsOn(bootJars)
-	build.dependsOn(bootJars)
 
 }
 
@@ -217,9 +183,25 @@ project('test-multi-context') {
 		//hadoopruntime.include group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
 	}
 
-	configurations { 
+	configurations {
 		testRuntime.exclude module: "spring-data-hadoop-batch" 
-	} 
+	}
+
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 
 }
 
@@ -244,16 +226,28 @@ project('test-activator') {
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 
-		
-
 		hadoopruntime configurations.runtime
-		//hadoopruntime.include group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
 	}
 
 	configurations { 
 		testRuntime.exclude module: "spring-data-hadoop-batch" 
-	} 
+	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 project('test-activator-restart') {
@@ -277,16 +271,28 @@ project('test-activator-restart') {
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 
-		
-
 		hadoopruntime configurations.runtime
-		//hadoopruntime.include group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
 	}
 
 	configurations { 
 		testRuntime.exclude module: "spring-data-hadoop-batch" 
-	} 
+	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 project('test-activator-annotations') {
@@ -313,13 +319,27 @@ project('test-activator-annotations') {
 		
 
 		hadoopruntime configurations.runtime
-		//hadoopruntime.include group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
 	}
 
-	configurations { 
-		testRuntime.exclude module: "spring-data-hadoop-batch" 
-	} 
+	configurations {
+		testRuntime.exclude module: "spring-data-hadoop-batch"
+	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 
@@ -354,6 +374,21 @@ project('test-container-launch-failure') {
 		testRuntime.exclude module: "spring-data-hadoop-batch" 
 	} 
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 
@@ -386,8 +421,23 @@ project('test-install-submit') {
 
 	configurations { 
 		testRuntime.exclude module: "spring-data-hadoop-batch" 
-	} 
+	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.ActivatorAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 
@@ -419,6 +469,21 @@ project('test-batch') {
 		runtime.exclude group: "org.slf4j", module: "slf4j-log4j12"
 	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.BatchClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.BatchContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.BatchAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 project('test-batch-files') {
@@ -449,6 +514,21 @@ project('test-batch-files') {
 		runtime.exclude group: "org.slf4j", module: "slf4j-log4j12"
 	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.BatchClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.BatchContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.BatchAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 project('test-batch-restart-db') {
@@ -481,6 +561,21 @@ project('test-batch-restart-db') {
 		runtime.exclude group: "org.slf4j", module: "slf4j-log4j12"
 	}
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.BatchClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.BatchContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.BatchAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 project('test-multi-context-zip') {
@@ -524,7 +619,25 @@ project('test-multi-context-zip') {
 	}
 	test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextClientApplication'
+	}
+	task containerBootZip(type: BootRepackage, dependsOn: containerZip) {
+		customConfiguration = "hadoopruntime"
+		withJarTask = containerZip
+		mainClass = 'org.springframework.yarn.examples.MultiContextContainerApplication'
+	}
 
+	task appmasterBootZip(type: BootRepackage, dependsOn: appmasterZip) {
+		customConfiguration = "hadoopruntime"
+		withJarTask = appmasterZip
+		mainClass = 'org.springframework.yarn.examples.MultiContextAppmasterApplication'
+	}
+
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootZip,appmasterBootZip]
+	build.dependsOn(bootJars)
 }
 
 project('test-staging-global') {
@@ -568,6 +681,21 @@ project('test-staging-global') {
 	}
 	test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 
@@ -612,6 +740,21 @@ project('test-staging-default') {
 	}
 	test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
 
@@ -656,5 +799,20 @@ project('test-staging-home') {
 	}
 	test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 
+	task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+		withJarTask = clientJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextClientApplication'
+	}
+	task containerBootJar(type: BootRepackage, dependsOn: containerJar) {
+		withJarTask = containerJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextContainerApplication'
+	}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.examples.MultiContextAppmasterApplication'
+	}
+	task bootJars
+	bootJars.dependsOn = [clientBoot,containerBootJar,appmasterBootJar]
+	build.dependsOn(bootJars)
 }
 
