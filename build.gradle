@@ -546,6 +546,7 @@ project('test-batch-restart-db') {
 		runtime "log4j:log4j:$log4jVersion"
 		runtime "mysql:mysql-connector-java:5.1.23"
 		runtime "commons-dbcp:commons-dbcp:1.2.2"
+		runtime "commons-pool:commons-pool:1.6"
 
 
 		//runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"

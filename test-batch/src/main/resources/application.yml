@@ -31,6 +31,6 @@ spring:
             launchcontext:
                 archiveFile: test-batch-appmaster-2.0.0.BUILD-SNAPSHOT.jar
         appmaster:
-            keepContextAlive: false
+            keepContextAlive: true
             launchcontext:
                 archiveFile: test-batch-container-2.0.0.BUILD-SNAPSHOT.jar

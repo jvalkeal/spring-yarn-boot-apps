@@ -29,8 +29,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.am.YarnAppmaster;
-import org.springframework.yarn.batch.am.BatchYarnAppmaster;
 import org.springframework.yarn.batch.config.EnableYarnBatchProcessing;
 import org.springframework.yarn.batch.partition.StaticPartitionHandler;
 
@@ -45,8 +43,8 @@ public class BatchAppmasterApplication {
 	@Autowired
 	private StepBuilderFactory stepFactory;
 
-	@Autowired
-	private YarnAppmaster yarnAppmaster;
+//	@Autowired
+//	private YarnAppmaster yarnAppmaster;
 
 	@Bean
 	public Job job() throws Exception {
@@ -66,7 +64,7 @@ public class BatchAppmasterApplication {
 	protected Step master1() throws Exception {
 		return stepFactory.get("master1")
 				.partitioner("remoteStep1", partitioner())
-				.partitionHandler(partitionHandler("remoteStep1"))
+				.partitionHandler(partitionHandler1())
 				.build();
 	}
 
@@ -74,7 +72,7 @@ public class BatchAppmasterApplication {
 	protected Step master2() throws Exception {
 		return stepFactory.get("master2")
 				.partitioner("remoteStep2", partitioner())
-				.partitionHandler(partitionHandler("remoteStep2"))
+				.partitionHandler(partitionHandler2())
 				.build();
 	}
 
@@ -83,12 +81,28 @@ public class BatchAppmasterApplication {
 		return new SimplePartitioner();
 	}
 
-	protected PartitionHandler partitionHandler(String stepName) {
-		StaticPartitionHandler handler = new StaticPartitionHandler((BatchYarnAppmaster)yarnAppmaster);
-		handler.setStepName(stepName);
+	@Bean
+	protected PartitionHandler partitionHandler1() {
+		StaticPartitionHandler handler = new StaticPartitionHandler();
+		handler.setStepName("remoteStep1");
 		handler.setGridSize(2);
 		return handler;
 	}
+
+	@Bean
+	protected PartitionHandler partitionHandler2() {
+		StaticPartitionHandler handler = new StaticPartitionHandler();
+		handler.setStepName("remoteStep2");
+		handler.setGridSize(2);
+		return handler;
+	}
+
+//	protected PartitionHandler partitionHandler(String stepName) {
+//		StaticPartitionHandler handler = new StaticPartitionHandler((BatchYarnAppmaster)yarnAppmaster);
+//		handler.setStepName(stepName);
+//		handler.setGridSize(2);
+//		return handler;
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(BatchAppmasterApplication.class, new String[]{"foo=jee"});
