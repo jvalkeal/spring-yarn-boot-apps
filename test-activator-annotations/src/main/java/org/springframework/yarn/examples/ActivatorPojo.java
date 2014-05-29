@@ -21,8 +21,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.fs.FsShell;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
-import org.springframework.yarn.annotation.YarnContainer;
+import org.springframework.yarn.annotation.OnContainerStart;
+import org.springframework.yarn.annotation.YarnComponent;
 import org.springframework.yarn.annotation.YarnParameter;
 
 /**
@@ -35,7 +35,7 @@ import org.springframework.yarn.annotation.YarnParameter;
  * @author Janne Valkealahti
  *
  */
-@YarnContainer
+@YarnComponent
 public class ActivatorPojo {
 
 	private static final Log log = LogFactory.getLog(ActivatorPojo.class);
@@ -43,7 +43,7 @@ public class ActivatorPojo {
 	@Autowired
 	private Configuration configuration;
 
-	@OnYarnContainerStart
+	@OnContainerStart
 	public void publicVoidArgsMethod(@YarnParameter("argumentsKeyFoo1") String value) {
 		log.info("Hello from ActivatorPojo with argumentsKeyFoo1=" + value);
 		log.info("Checking access to hdfs");

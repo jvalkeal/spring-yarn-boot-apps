@@ -53,7 +53,7 @@ public class BatchTests extends AbstractBootYarnClusterTests {
 				"--spring.yarn.client.files[0]=file:build/libs/test-batch-files-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
 				"--spring.yarn.client.files[1]=file:build/libs/test-batch-files-container-2.0.0.BUILD-SNAPSHOT.jar" };
 
-		ApplicationInfo info = submitApplicationAndWait(BatchClientApplication.class, args, 1, TimeUnit.MINUTES);
+		ApplicationInfo info = submitApplicationAndWait(BatchClientApplication.class, args, 2, TimeUnit.MINUTES);
 		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());

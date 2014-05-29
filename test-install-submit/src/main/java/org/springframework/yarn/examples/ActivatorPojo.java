@@ -21,8 +21,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.fs.FsShell;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
-import org.springframework.yarn.annotation.YarnContainer;
+import org.springframework.yarn.annotation.OnContainerStart;
+import org.springframework.yarn.annotation.YarnComponent;
 
 /**
  * A simple pojo to demonstrate container activator concept.
@@ -34,7 +34,7 @@ import org.springframework.yarn.annotation.YarnContainer;
  * @author Janne Valkealahti
  *
  */
-@YarnContainer
+@YarnComponent
 public class ActivatorPojo {
 
 	private static final Log log = LogFactory.getLog(ActivatorPojo.class);
@@ -42,7 +42,7 @@ public class ActivatorPojo {
 	@Autowired
 	private Configuration configuration;
 
-	@OnYarnContainerStart
+	@OnContainerStart
 	public void publicVoidNoArgsMethod() {
 		log.info("Hello from ActivatorPojo");
 		log.info("Checking access to hdfs");

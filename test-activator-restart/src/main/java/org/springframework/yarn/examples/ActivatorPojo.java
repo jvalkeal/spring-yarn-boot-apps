@@ -18,17 +18,17 @@ package org.springframework.yarn.examples;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.yarn.YarnSystemConstants;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
-import org.springframework.yarn.annotation.YarnContainer;
+import org.springframework.yarn.annotation.OnContainerStart;
+import org.springframework.yarn.annotation.YarnComponent;
 import org.springframework.yarn.annotation.YarnEnvironment;
 import org.springframework.yarn.launch.ExitStatus;
 
-@YarnContainer
+@YarnComponent
 public class ActivatorPojo {
 
 	private static final Log log = LogFactory.getLog(ActivatorPojo.class);
 
-	@OnYarnContainerStart
+	@OnContainerStart
 	public String publicMethod(@YarnEnvironment(YarnSystemConstants.SYARN_CONTAINER_ID) String containerIdString) {
 		log.info("Hello from ActivatorPojo");
 		log.info("SYARN_CONTAINER_ID=" + containerIdString);
