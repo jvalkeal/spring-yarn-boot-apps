@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class MultiContextTests extends AbstractBootYarnClusterTests {
 				"--spring.yarn.client.files[2]=file:build/dependency-all-libs/*.jar"
 		};
 
-		ApplicationInfo info = submitApplicationAndWait(MultiContextClientApplication.class, args);
+		ApplicationInfo info = submitApplicationAndWait(MultiContextClientApplication.class, args, 2, TimeUnit.MINUTES);
 		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());

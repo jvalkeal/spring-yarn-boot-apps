@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +55,7 @@ public class MultiContextTests extends AbstractBootYarnClusterTests {
 				"--spring.yarn.client.files[1]=file:build/libs/test-staging-global-container-2.0.0.BUILD-SNAPSHOT.jar"
 		};
 
-		ApplicationInfo info = submitApplicationAndWait(MultiContextClientApplication.class, args);
+		ApplicationInfo info = submitApplicationAndWait(MultiContextClientApplication.class, args, 2, TimeUnit.MINUTES);
 		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		listFiles();

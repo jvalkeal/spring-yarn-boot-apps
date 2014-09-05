@@ -53,7 +53,7 @@ public class BatchTests extends AbstractBootYarnClusterTests {
 		shell.touchz("/tmp/remoteStep1partition0");
 		shell.touchz("/tmp/remoteStep1partition1");
 
-		ApplicationInfo info1 = submitApplicationAndWait(BatchClientApplication.class, args, 3, TimeUnit.MINUTES);
+		ApplicationInfo info1 = submitApplicationAndWait(BatchClientApplication.class, args, 4, TimeUnit.MINUTES);
 		assertThat(info1.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources1 = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info1.getApplicationId());
@@ -97,7 +97,7 @@ public class BatchTests extends AbstractBootYarnClusterTests {
 		shell.touchz("/tmp/remoteStep2partition0");
 		shell.touchz("/tmp/remoteStep2partition1");
 
-		ApplicationInfo info2 = submitApplicationAndWait(BatchClientApplication.class, args, 3, TimeUnit.MINUTES);
+		ApplicationInfo info2 = submitApplicationAndWait(BatchClientApplication.class, args, 4, TimeUnit.MINUTES);
 		assertThat(info2.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources2 = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info2.getApplicationId());

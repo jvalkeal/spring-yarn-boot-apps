@@ -43,7 +43,7 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 				"--spring.yarn.client.files[0]=file:build/libs/test-activator-appmaster-2.0.0.BUILD-SNAPSHOT.jar",
 				"--spring.yarn.client.files[1]=file:build/libs/test-activator-container-2.0.0.BUILD-SNAPSHOT.jar" };
 
-		ApplicationInfo info = submitApplicationAndWait(ActivatorClientApplication.class, args, 1, TimeUnit.MINUTES);
+		ApplicationInfo info = submitApplicationAndWait(ActivatorClientApplication.class, args, 2, TimeUnit.MINUTES);
 		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), info.getApplicationId());

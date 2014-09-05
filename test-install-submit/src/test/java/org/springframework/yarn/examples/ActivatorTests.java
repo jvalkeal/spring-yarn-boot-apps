@@ -87,7 +87,7 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 		submitApp.applicationBaseDir(BASE);
 		ApplicationId applicationId = submitApp.run(submitAppArgs);
 
-		YarnApplicationState state = waitState(applicationId, 1, TimeUnit.MINUTES, YarnApplicationState.FINISHED);
+		YarnApplicationState state = waitState(applicationId, 2, TimeUnit.MINUTES, YarnApplicationState.FINISHED);
 		assertThat(state, is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(), applicationId);
