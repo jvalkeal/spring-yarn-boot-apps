@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnPushApplication;
 import org.springframework.yarn.boot.app.YarnSubmitApplication;
 import org.springframework.yarn.boot.test.junit.AbstractBootYarnClusterTests;
@@ -76,9 +77,12 @@ public class ActivatorTests extends AbstractBootYarnClusterTests {
 		listFiles();
 		catFile(BASE + ID + "/application.properties");
 
+		String rm = getConfiguration().get("yarn.resourcemanager.address");
+		String[] split = StringUtils.split(rm, ":");
 		String[] submitAppArgs = new String[] {
 				"--spring.yarn.applicationDir=" + BASE + ID + "/",
 				"--spring.hadoop.fsUri=" + getConfiguration().get("fs.defaultFS"),
+				"--spring.hadoop.resourceManagerHost=" + split[0],
 				"--spring.hadoop.resourceManagerAddress=" + getConfiguration().get("yarn.resourcemanager.address"),
 				"--spring.hadoop.resourceManagerSchedulerAddress=" + getConfiguration().get("yarn.resourcemanager.scheduler.address")
 				};
